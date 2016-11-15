@@ -1,6 +1,6 @@
 function sum(data) {
 	var flatArray = flatten(data);
-	return flatArray.reduce((total, item) => total + item);
+	return flatArray.reduce((total, item) => total + item, 0);
 }
 
 function count(data) {
@@ -10,7 +10,7 @@ function count(data) {
 
 function mean(data) {
 	var flatArray = flatten(data);
-	var product = flatArray.reduce((total, item) => total * item);
+	var product = flatArray.reduce((total, item) => total * item, 1);
 	return Math.pow(product, 1/count(data));
 }
 
@@ -57,9 +57,9 @@ function midrange(data) {
 function variance(data) {
 	var flatArray = flatten(data);
 	var mean = aritmeticMean(data);
-	var items = flatArray.map(x => Math.pow(x - mean, 2));
+	var varianceSum = flatArray.reduce((total, item) => total + Math.pow(item - mean, 2), 0);
 
-	return sum(items) / (items.length - 1);
+	return varianceSum / (flatArray.length - 1);
 }
 
 function stdev(data) {
@@ -82,4 +82,4 @@ function aritmeticMean(data) {
 
 var arr = [[5,6,9],[3,3,3]];
 console.log(arr);
-console.log(count(arr));
+console.log(variance(arr));
