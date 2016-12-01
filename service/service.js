@@ -67,7 +67,7 @@ class Service extends Runnable {
 	datasetUpdate(req, res) {
 		console.log("service.datasetUpdate", req.body);
 		this.db.datasetUpdate(1, req.body, function(err, result) {
-			res.status(200);
+			res.status(200).send();
 		});
 	}
 }
