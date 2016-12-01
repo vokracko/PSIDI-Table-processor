@@ -1,0 +1,11 @@
+{
+	"name": "service",
+	"version": "0.1.0",
+	"bin": "./run.js",
+	"dependencies": {
+		"express": "latest",
+		"mysql": "latest",
+		"xmlhttprequest": "latest",
+		"body-parser": "latest"
+	}
+}

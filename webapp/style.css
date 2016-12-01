@@ -1,0 +1,15 @@
+table {}
+
+td {
+	padding: 3px;
+	border: 1px solid black;
+}
+
+td.table-header {
+	background-color: #999;
+}
+
+#overlay > div {
+	font-size: 36px;
+	font-weight: bold;
+}

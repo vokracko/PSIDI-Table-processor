@@ -1,0 +1,10 @@
+{
+	"name": "worker",
+	"version": "0.1.0",
+	"bin": "./run.js",
+	"dependencies": {
+		"express": "latest",
+		"sleep": "latest",
+		"body-parser": "latest"
+	}
+}

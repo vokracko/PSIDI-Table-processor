@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Marjoška datasets</title>
+	<script type="text/javascript" src="renderable.js"></script>
+	<script type="text/javascript" src="renderer.js"></script>
+	<script type="text/javascript" src="client.js"></script>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="dataset">
+		<div id="buttons"></div>
+		<div id="table"></div>
+	</div>
+	<div id="overlay">
+<!-- 		<form id="loginForm">
+		<label for="username">Username</label><input name="username" type="text"><br>
+		<label for="password">Password</label><input name="password" type="password"><br>
+		<input name="login" value="Login" type="submit">
+	</form>
+	 -->	</div>
+	<script type="text/javascript">
+		var renderer = new Renderer()
+		var table = new Table("table", null, null);
+		var overlay = new Overlay("overlay", {text: "It works!"});
+		var client = new Client("localhost", 4321, renderer, table);
+		var items = [
+			table,
+			overlay,
+			new Button("buttons", {text:"update"}, client.datasetUpdate.bind(client)),
+			new Button("buttons", {text:"count"}, client.simpleOperation.bind(client, "count")),
+			new Button("buttons", {text:"sum"}, client.simpleOperation.bind(client, "sum")),
+			new Button("buttons", {text:"mean"}, client.simpleOperation.bind(client, "mean")),
+			new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
+			new Button("buttons", {text:"mode"}, client.simpleOperation.bind(client, "mode")),
+			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
+		];
+
+		renderer.addItems(items);
+		renderer.setOverlay(overlay);
+		renderer.renderItems();
+
+		client.datasetGet();
+
+	</script>
+</body>
+</html>

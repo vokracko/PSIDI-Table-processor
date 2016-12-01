@@ -1,0 +1,9 @@
+{
+	"port": 4321,
+	"db": {
+		"host": "31.31.77.215",
+		"user": "psidi",
+		"password": "psidi",
+		"database": "psidi"
+	}
+}
