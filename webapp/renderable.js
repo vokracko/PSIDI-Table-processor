@@ -112,34 +112,46 @@ class Table extends Renderable {
 
 		if(type == "dataset") {
 			cell.innerHTML = "Dataset";
-			cell.onclick = this.selectAll.bind(this);
+			cell.onclick = this.select.bind(this, "all", null);
 		} else {
 			cell.innerHTML = index;
-			cell.onclick = type == "row" ? this.selectRow.bind(this, index) : this.selectColumn.bind(this, index);
+			cell.onclick = type == "row" 
+				? this.select.bind(this, "row", index) 
+				: this.select.bind(this, "column", index);
 		}
 
 		return cell;
 	}
 
 	selectRow(index) {
-		this.selectNone();
-		this._selectRow(index);
-	}
-
-	_selectRow(index) {
 		var row = Array.from(this.element.rows[index].cells);
 		row.map(cell => cell.classList.add("selected"));
 	}
 
 	selectColumn(index) {
-		this.selectNone();
 		var rows = Array.from(this.element.rows);
 		rows.map(row => row.cells[index].classList.add("selected"));
 	}
 
 	selectAll() {
 		var rows = Array.from(this.element.rows);
-		rows.map(row => this._selectRow(row.rowIndex));
+		rows.map(row => this.selectRow(row.rowIndex));
+	}
+
+	select(type, index, e) {
+
+		if(e.target.classList.contains("selected")) {
+			this.selectNone();
+			return;
+		}
+
+		this.selectNone();
+
+		switch(type) {
+			case "row": this.selectRow(index); break;
+			case "column": this.selectColumn(index); break;
+			case "all": this.selectAll(); break;
+		}
 	}
 
 	selectNone() {
