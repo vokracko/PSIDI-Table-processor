@@ -22,13 +22,14 @@ class Client {
 	}
 
 	log(response) {
+		response = JSON.parse(response);
 		console.log("log", response);
-		this.renderer.flashMessage(response, "success");
+		this.renderer.flashMessage("Result is " + response, "success");
 	}
 
 	simpleOperation(operation) { 
 		var dataset_id = 1; // TODO výber aktuálního datasetu
-		var shope = "dataset"; // TODO row/col/id
+		var scope = "dataset"; // TODO row/col/id
 
 		// TOOD if scope => jina adresa
 
@@ -50,9 +51,7 @@ class Client {
 	}
 
 	renderTable(response) {
-		console.log("client.renderTable", response);
 		var data = JSON.parse(response);
-		console.log(data, this.datasource);
 		this.datasource.setData({"data": data});
 		this.renderer.renderItems();
 	}

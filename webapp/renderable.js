@@ -6,6 +6,7 @@ class Renderable {
 		this.location = location;
 		this.toRender = true;
 		this.timeoutID = null;
+		this.defaultDisplay = "inline-block";
 	}
 
 	render() {
@@ -23,6 +24,7 @@ class Renderable {
 		}
 
 		var target = document.getElementById(this.location);
+		this.element.style.display = this.defaultDisplay;
 		target.appendChild(this.element);
 		this.toRender = false;
 	}
@@ -32,30 +34,43 @@ class Renderable {
 		this.toRender = true;
 	}
 
-	hide(element) {
-		element.style.display = "none";
+	hide() {
+		this.element.style.display = "none";
 	}
 
 	flash(interval) {
 		this.render();
-		this.timeoutID = setTimeout(this.hide, interval, this.element);
+		this.timeoutID = setTimeout(this.hide.bind(this), interval, this.element);
 	}
 }
 
 class Button extends Renderable {
 	constructor(location, data, callback) {
-		super("input", location);
+		super("button", location);
 		this.element.type = "button";
 		this.element.onclick = callback;
-		this.element.value = data.text;
+		this.element.innerHTML = data.text;
+		this.defaultDisplay = "block";
+		this.element.style.display = "block";
+		this.element.classList.add("btn-default");
+		this.element.classList.add("btn");
+
+		if(data.class) {
+			this.element.classList.add(data.class);
+		}
 	}
 }
 
 class Table extends Renderable {
 	constructor(location, data, callback) {
 		super("table", location);
+		this.element.appendChild(document.createElement("tbody"));
 		this.element.setAttribute("cellspacing", 0);
 		this.element.setAttribute("cellpadding", 0);
+		this.element.classList.add("table");
+		this.element.classList.add("table-bordered");
+		this.element.classList.add("table-striped");
+
 		this.data = data;
 		this.toRender = false;
 	}
@@ -68,14 +83,14 @@ class Table extends Renderable {
 		var rowHeader = document.createElement("tr");
 
 		for(var i = 0; i < this.data.data[0].length + 1; ++i) { // +1 => table header col
-			rowHeader.appendChild(this.createHeader(i, i == 0));
+			rowHeader.appendChild(this.createHeader(i, i == 0 ? "dataset" : "column"));
 		}
 
-		this.element.appendChild(rowHeader);
+		this.element.tBodies[0].appendChild(rowHeader);
 
 		for(var i = 0; i < this.data.data.length; ++i) {
 			var row = document.createElement("tr");
-			row.appendChild(this.createHeader(i+1));
+			row.appendChild(this.createHeader(i+1, "row"));
 
 			for(var j = 0; j < this.data.data[i].length; ++j) {
 				var cell = document.createElement("td");
@@ -84,33 +99,67 @@ class Table extends Renderable {
 				row.appendChild(cell);
 			}
 
-			this.element.appendChild(row);
+			this.element.tBodies[0].appendChild(row);
 		}
 
 		super.render();
 	}
 
-	createHeader(index, blank = false) {
+	createHeader(index, type) {
 		// TODO - make selectable for row/col 
 		var cell = document.createElement("td");
-		cell.setAttribute("class", "table-header");
+		cell.classList.add("table-header");
 
-		if(!blank) {
+		if(type == "dataset") {
+			cell.innerHTML = "Dataset";
+			cell.onclick = this.selectAll.bind(this);
+		} else {
 			cell.innerHTML = index;
+			cell.onclick = type == "row" ? this.selectRow.bind(this, index) : this.selectColumn.bind(this, index);
 		}
+
 		return cell;
+	}
+
+	selectRow(index) {
+		this.selectNone();
+		this._selectRow(index);
+	}
+
+	_selectRow(index) {
+		var row = Array.from(this.element.rows[index].cells);
+		row.map(cell => cell.classList.add("selected"));
+	}
+
+	selectColumn(index) {
+		this.selectNone();
+		var rows = Array.from(this.element.rows);
+		rows.map(row => row.cells[index].classList.add("selected"));
+	}
+
+	selectAll() {
+		var rows = Array.from(this.element.rows);
+		rows.map(row => this._selectRow(row.rowIndex));
+	}
+
+	selectNone() {
+		var rows = Array.from(this.element.rows);
+		rows.map(row => {
+			var cells = Array.from(row.cells);
+			cells.map(cell => cell.classList.remove("selected"));
+		});
 	}
 
 	toArray() {
 		var result = [];
 
 		// 1 => first row/col is header
-		for(var i = 1; i < this.element.children.length; ++i) {
-			var row = this.element.children[i];
+		for(var i = 1; i < this.element.rows.length; ++i) {
+			var row = this.element.rows[i];
 			var rowResult = [];
 
-			for(var j = 1; j < row.children.length; ++j) {
-				var cell = row.children[j];
+			for(var j = 1; j < row.cells.length; ++j) {
+				var cell = row.cells[j];
 				rowResult.push(parseFloat(cell.innerHTML));
 			}
 
@@ -123,13 +172,19 @@ class Table extends Renderable {
 }
 
 class Overlay extends Renderable {
-	constructor(location, data) {
+	constructor(location, data, callback) {
 		super("div", location);
 		this.data = data;
+		this.toRender = false;
+		this.element.onclick = this.hide.bind(this);
+		this.hide();
+		this.element.setAttribute("id", this.data.id);
 	}
 
 	render() {
+		console.log("rendering overlay");
 		this.element.innerHTML = this.data.text;
+		this.element.setAttribute("class", this.data.type);
 		super.render();
 	}
 }

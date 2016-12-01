@@ -1,4 +1,15 @@
-table {}
+body {
+	padding: 0;
+	margin:0;
+}
+
+table {
+	float:left;
+	margin: 10px;
+	width:initial !important;;
+	border: 0;
+
+}
 
 td {
 	padding: 3px;
@@ -7,9 +18,50 @@ td {
 
 td.table-header {
 	background-color: #999;
+	color: #000;
 }
 
-#overlay > div {
+#overlay {
+	margin: auto;
+	width: 100%;
+	height: 100%;
+	background-color: #999999;
+	position: fixed;
+	opacity: 0.8;
+	text-align: center;
+	padding-top: 200px;
 	font-size: 36px;
 	font-weight: bold;
+}
+
+.success {
+	background-color: green;
+}
+
+.fail {
+	background-color: red;
+}
+
+td.selected {
+	background-color: #3e90d5;
+}
+
+td.selected.table-header {
+	background-color: #214563;
+	color: #FFF;
+}
+
+#buttons {
+	float:left;
+	width: 120px;
+}
+
+#buttons button {
+	width: 100px;
+	margin: 2px;
+	float:right;
+}
+
+#buttons-operation {
+	padding: 10px 0;
 }

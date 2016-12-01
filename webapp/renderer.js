@@ -27,6 +27,6 @@ class Renderer {
 
 	flashMessage(text, type) {
 		this.overlay.setData({text: text, type: type});
-		this.overlay.flash(5500);
+		this.overlay.flash(2000);
 	}
 }
