@@ -7,6 +7,7 @@
 
 ## Lighttpd config 
 `/etc/lighttpd/lighttpd.conf`
+
 <pre>
 server.port	= 80
 server.username	= "**{$USER}**"
@@ -36,8 +37,12 @@ setenv.add-response-header = ( "Access-Control-Allow-Origin" => "*" )
 
 # Run
 `# lighttpd -D -f /etc/lighttpd/lighttpd.conf &`
+
 `{projectLocation}/ $ node run.js`
+
 [localhost webapp](http://localhost)
+
 # Configuration
 `{projectLocation}/{service,worker}/config.json`
+
 [Database administration](http://adminer.vokracko.cz/?server=31.31.77.215&username=psidi&db=psidi&select=cell) (pw: psidi)
