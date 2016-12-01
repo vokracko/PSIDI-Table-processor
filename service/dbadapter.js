@@ -30,7 +30,6 @@ class DbAdapter {
 		}
 
 		sql += values.join(', ');
-		console.log(sql);
 		return sql;
 	}
 
@@ -41,7 +40,7 @@ class DbAdapter {
 			} else {
 				var dataset_id = result.insertID;
 				this.connection.query(this.cellInsertPrepare(dataset_id, data), function(err, result) {
-					callback(err, true);
+					callback(err, result);
 				});
 			}
 
@@ -55,7 +54,7 @@ class DbAdapter {
 				callback(err, false);
 			} else {
 				this.connection.query(this.cellInsertPrepare(dataset_id, data), function(err, result) {
-					callback(err, true);
+					callback(err, result);
 				});
 			}
 		}.bind(this));
@@ -118,7 +117,6 @@ class DbAdapter {
 		}
 
 		sql += values.join(', ');
-		console.log(sql);
 		return sql;
 	}
 
