@@ -69,7 +69,7 @@ class DbAdapter {
 
 	datasetGet(id, callback) {
 		this.connection.query('SELECT GROUP_CONCAT(data ORDER BY col ASC) as res FROM cell WHERE dataset_id = ? GROUP BY row ORDER BY row ASC', [id], function(err, rows, fields) {
-			rows = rows.map(x => x.res.split(','));
+			rows = rows.map(x => x.res.split(',').map(y => parseFloat(y)));
 			callback(err, rows);
 		});
 	}
