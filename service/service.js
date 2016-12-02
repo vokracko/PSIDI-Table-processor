@@ -47,27 +47,23 @@ class Service extends Runnable {
 
 	operation(req, res) {
 		if(req.query.action) { // something will be computed 
+			var dbCall;
+
 			if(req.query.action == "transpose") { // send double array to compute result
-				this.db.datasetGet(1, function(err, rows) {
-					this.workers[0].execute(
-						"/operation/transpose",
-						{data: rows},
-						function(response) {
-							res.send(response); //send -> response is already json
-						}
-					);
-				}.bind(this));
-			} else { // send flat array to compute result
-				this.db.datasetGetFlat(1, function(err, rows) {
-					this.workers[0].execute(
-						"/operation/" + req.query.action,
-						{data: rows},
-						function(response) {
-							res.send(response); // send -> response is already json
-						}
-					);
-				}.bind(this));	
+				dbCall = this.db.datasetGet.bind(this.db);
+			} else {
+				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
+
+			dbCall(1, function(err, rows) {
+				this.workers[0].execute(
+					"/operation/" + req.query.action,
+					{data: rows},
+					function(response) {
+						res.send(response); // send -> response is already json
+					}
+				);
+			}.bind(this));	
 		} else { // just send dataset
 			this.db.datasetGet(1, function(err, rows) {
 				res.json(rows); // json -> rows = array
