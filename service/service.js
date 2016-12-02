@@ -58,7 +58,7 @@ class Service extends Runnable {
 			dbCall(1, function(err, rows) {
 				this.workers[0].execute(
 					"/operation/" + req.query.action,
-					{data: rows},
+					rows,
 					function(response) {
 						res.send(response); // send -> response is already json
 					}
