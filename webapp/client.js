@@ -40,6 +40,23 @@ class Client {
 		);
 	}
 
+	selected() {
+		var tableHeaders = document.getElementsByClassName("table-header selected");
+		
+		if(tableHeaders.length == 0) { //none
+			return {scope: "all"};
+		}
+
+		var cell = tableHeaders[0];
+
+		if(cell.parentNode.rowIndex == 0) {
+			return {scope: "column", index: cell.cellIndex};
+		}
+
+		return {scope: "row", index: cell.parentNode.rowIndex};
+
+	}
+
 	operationInput(operation) {
 		var scalar = prompt("Set value");
 		var dataset_id = 1; // TODO actual dataset number

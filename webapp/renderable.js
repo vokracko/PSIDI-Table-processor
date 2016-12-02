@@ -114,7 +114,7 @@ class Table extends Renderable {
 
 		if(type == "dataset") {
 			cell.innerHTML = "Dataset";
-			cell.onclick = this.select.bind(this, "all", null);
+			cell.onclick = this.select.bind(this, "none", null);
 		} else {
 			cell.innerHTML = index;
 			cell.onclick = type == "row" 
@@ -135,11 +135,6 @@ class Table extends Renderable {
 		rows.map(row => row.cells[index].classList.add("selected"));
 	}
 
-	selectAll() {
-		var rows = Array.from(this.element.rows);
-		rows.map(row => this.selectRow(row.rowIndex));
-	}
-
 	select(type, index, e) {
 
 		if(e.target.classList.contains("selected")) {
@@ -152,7 +147,7 @@ class Table extends Renderable {
 		switch(type) {
 			case "row": this.selectRow(index); break;
 			case "column": this.selectColumn(index); break;
-			case "all": this.selectAll(); break;
+			case "none": this.selectNone(); break;
 		}
 	}
 
