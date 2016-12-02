@@ -28,8 +28,8 @@ class Client {
 	}
 
 	operation(operation) { 
-		var dataset_id = 1; // TODO výber aktuálního datasetu
-		var scope = "dataset"; // TODO row/col/id
+		var dataset_id = 1; // TODO actual dataset number
+		var scope = "dataset"; // TODO row/col/ + index
 
 		// TOOD if scope => jina adresa
 
@@ -42,16 +42,13 @@ class Client {
 	}
 
 	transpose() {
-		var dataset_id = 1; // TODO výber aktuálního datasetu
+		var dataset_id = 1; // TODO actual dataset number
 		this.sendRequest(
 			"get", 
 			"/user/dataset/" + dataset_id + "?action=transpose",
 			null,
 			function(response) {
-				var data = JSON.parse(response);
-				console.log("client.transpose.response", response);
-				console.log("client.transpose.parsed", data);
-				this.datasource.setData(data);
+				this.datasource.setData(JSON.parse(response));
 				this.renderer.renderItems();
 			}.bind(this)
 		);
@@ -62,7 +59,7 @@ class Client {
 	}
 
 	datasetUpdate() {
-		var data = this.datasource.toArray(); // TOOD dataset/col/row
+		var data = this.datasource.toArray();
 		this.sendRequest("post", "/user/dataset/1", data, this.flashMessage.bind(this, "Dataset saved", "success"));
 	}
 
