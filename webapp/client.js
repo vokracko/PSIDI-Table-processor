@@ -52,7 +52,7 @@ class Client {
 
 	renderTable(response) {
 		var data = JSON.parse(response);
-		this.datasource.setData({"data": data});
+		this.datasource.setData(data);
 		this.renderer.renderItems();
 	}
 

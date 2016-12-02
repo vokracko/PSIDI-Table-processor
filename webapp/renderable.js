@@ -80,22 +80,24 @@ class Table extends Renderable {
 			return;
 		}
 
+		while(this.element.rows[0]) this.element.deleteRow(0);
+
 		var rowHeader = document.createElement("tr");
 
-		for(var i = 0; i < this.data.data[0].length + 1; ++i) { // +1 => table header col
+		for(var i = 0; i < this.data[0].length + 1; ++i) { // +1 => table header col
 			rowHeader.appendChild(this.createHeader(i, i == 0 ? "dataset" : "column"));
 		}
 
 		this.element.tBodies[0].appendChild(rowHeader);
 
-		for(var i = 0; i < this.data.data.length; ++i) {
+		for(var i = 0; i < this.data.length; ++i) {
 			var row = document.createElement("tr");
 			row.appendChild(this.createHeader(i+1, "row"));
 
-			for(var j = 0; j < this.data.data[i].length; ++j) {
+			for(var j = 0; j < this.data[i].length; ++j) {
 				var cell = document.createElement("td");
 				cell.setAttribute("contenteditable", "true");
-				cell.innerHTML = this.data.data[i][j];
+				cell.innerHTML = this.data[i][j];
 				row.appendChild(cell);
 			}
 
