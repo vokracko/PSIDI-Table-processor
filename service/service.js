@@ -40,26 +40,37 @@ class Service extends Runnable {
 	}
 
 	start() {
-		this.app.get("/user/dataset/1", this.operationSimple.bind(this));
+		this.app.get("/user/dataset/1", this.operation.bind(this));
 		this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
 		this.app.listen(this.port);
 	}
 
-	operationSimple(req, res) {
-		if(req.query.action) { // tahle cast nefunguje
-			this.db.datasetGetFlat(1, function(err, rows) {
-				this.workers[0].execute(
-					"/operation/" + req.query.action,
-					{data: rows},
-					function(response) {
-						console.log("service.operationSimple.done", response);
-						res.json(response);
-					}
-				);
-			}.bind(this));
-		} else {
+	operation(req, res) {
+		if(req.query.action) { // something will be computed 
+			if(req.query.action == "transpose") { // send double array to compute result
+				this.db.datasetGet(1, function(err, rows) {
+					this.workers[0].execute(
+						"/operation/transpose",
+						{data: rows},
+						function(response) {
+							res.send(response); //send -> response is already json
+						}
+					);
+				}.bind(this));
+			} else { // send flat array to compute result
+				this.db.datasetGetFlat(1, function(err, rows) {
+					this.workers[0].execute(
+						"/operation/" + req.query.action,
+						{data: rows},
+						function(response) {
+							res.send(response); // send -> response is already json
+						}
+					);
+				}.bind(this));	
+			}
+		} else { // just send dataset
 			this.db.datasetGet(1, function(err, rows) {
-				res.json(rows);
+				res.json(rows); // json -> rows = array
 			});
 		}
 	}

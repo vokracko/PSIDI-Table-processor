@@ -119,7 +119,16 @@ class Worker {
 
 	// not implemented ===========================================================
 	transpose(json) { // [[]]
-		return json.data;
+		var result = []
+		var data = json.data;
+		var columnCount = data[0].length;
+
+		for(var i = 0; i < columnCount; ++i) {
+			var column = this.extractColumn(data, i);
+			result.push(column);
+		}
+
+		return result;
 	}
 
 	addSets(json) { // [[]]
@@ -141,6 +150,15 @@ class Worker {
 
 	aritmeticMean(json) {
 		return this.sum(json) / this.count(json);
+	}
+
+	extractColumn(data, index) {
+		return data.reduce((acc, row) => this.push(acc, row[index]), []);
+	}
+
+	push(array, item) {
+		array.push(item);
+		return array;
 	}
 }
 

@@ -52,6 +52,7 @@ td.selected.table-header {
 }
 
 #buttons {
+	padding: 10px 0 10px 5px;
 	float:left;
 	width: 120px;
 }
@@ -60,8 +61,4 @@ td.selected.table-header {
 	width: 100px;
 	margin: 2px;
 	float:right;
-}
-
-#buttons-operation {
-	padding: 10px 0;
 }

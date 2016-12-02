@@ -16,8 +16,6 @@
 	<div id="container">
 		<div id="dataset">
 			<div id="buttons">
-				<div id="buttons-operation">
-				</div>
 			</div>
 			<div id="table">
 			</div>
@@ -41,16 +39,16 @@
 		var items = [
 			table,
 			overlay,
-			new Button("buttons", {text:"update", class: "btn-primary"}, client.datasetUpdate.bind(client)),
-			new Button("buttons-operation", {text:"count"}, client.simpleOperation.bind(client, "count")),
-			new Button("buttons-operation", {text:"sum"}, client.simpleOperation.bind(client, "sum")),
-			new Button("buttons-operation", {text:"mean"}, client.simpleOperation.bind(client, "mean")),
-			new Button("buttons-operation", {text:"median"}, client.simpleOperation.bind(client, "median")),
-			new Button("buttons-operation", {text:"mode"}, client.simpleOperation.bind(client, "mode")),
-			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
-			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
-			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
-			// new Button("buttons", {text:"median"}, client.simpleOperation.bind(client, "median")),
+			new Button("buttons", {text:"count", class: "btn-primary"}, client.operation.bind(client, "count")),
+			new Button("buttons", {text:"sum", class: "btn-primary"}, client.operation.bind(client, "sum")),
+			new Button("buttons", {text:"mean", class: "btn-primary"}, client.operation.bind(client, "mean")),
+			new Button("buttons", {text:"median", class: "btn-primary"}, client.operation.bind(client, "median")),
+			new Button("buttons", {text:"mode", class: "btn-primary"}, client.operation.bind(client, "mode")),
+			new Button("buttons", {text:"transpose", class: "btn-primary"}, client.transpose.bind(client)),
+			new Button("buttons", {text:"update", class: "btn-danger"}, client.datasetUpdate.bind(client)),
+			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 		];
 
 		renderer.addItems(items);

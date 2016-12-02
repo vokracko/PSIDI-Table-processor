@@ -27,7 +27,7 @@ class Client {
 		this.renderer.flashMessage("Result is " + response, "success");
 	}
 
-	simpleOperation(operation) { 
+	operation(operation) { 
 		var dataset_id = 1; // TODO výber aktuálního datasetu
 		var scope = "dataset"; // TODO row/col/id
 
@@ -38,6 +38,22 @@ class Client {
 			"/user/dataset/" + dataset_id + "?action=" + operation,
 			null,
 			this.log.bind(this)
+		);
+	}
+
+	transpose() {
+		var dataset_id = 1; // TODO výber aktuálního datasetu
+		this.sendRequest(
+			"get", 
+			"/user/dataset/" + dataset_id + "?action=transpose",
+			null,
+			function(response) {
+				var data = JSON.parse(response);
+				console.log("client.transpose.response", response);
+				console.log("client.transpose.parsed", data);
+				this.datasource.setData(data);
+				this.renderer.renderItems();
+			}.bind(this)
 		);
 	}
 
