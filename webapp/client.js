@@ -32,12 +32,25 @@ class Client {
 		var scope = "dataset"; // TODO row/col/ + index
 
 		// TOOD if scope => jina adresa
-
 		this.sendRequest(
 			"get", 
 			"/user/dataset/" + dataset_id + "?action=" + operation,
 			null,
 			this.log.bind(this)
+		);
+	}
+
+	operationInput(operation) {
+		var scalar = prompt("Set value");
+		var dataset_id = 1; // TODO actual dataset number
+		var scope = "dataset"; // TODO row/col/ + index
+
+		// TOOD if scope => jina adresa
+		this.sendRequest(
+			"get", 
+			"/user/dataset/" + dataset_id + "?action=" + operation + "&scalar=" + scalar,
+			null,
+			this.renderTable.bind(this)
 		);
 	}
 

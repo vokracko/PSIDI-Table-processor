@@ -45,19 +45,30 @@ class Service extends Runnable {
 		this.app.listen(this.port);
 	}
 
+	isComplex(operation) {
+		return operation == "transpose" ||
+			operation == "scale" ||
+			operation == "add";
+	}
+
 	operation(req, res) {
 		if(req.query.action) { // something will be computed 
 			var dbCall;
+			var scalar = "";
 
-			if(req.query.action == "transpose") { // send double array to compute result
+			if(this.isComplex(req.query.action)) { // send double array to compute result
 				dbCall = this.db.datasetGet.bind(this.db);
+
+				if(req.query.scalar) {
+					scalar = "?scalar=" + req.query.scalar;
+				}
 			} else {
 				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
 
 			dbCall(1, function(err, rows) {
 				this.workers[0].execute(
-					"/operation/" + req.query.action,
+					"/operation/" + req.query.action + scalar,
 					rows,
 					function(response) {
 						res.send(response); // send -> response is already json

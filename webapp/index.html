@@ -48,6 +48,10 @@
 			new Button("buttons", {text:"variance", class: "btn-primary"}, client.operation.bind(client, "variance")),
 			new Button("buttons", {text:"stdev", class: "btn-primary"}, client.operation.bind(client, "stdev")),
 			new Button("buttons", {text:"transpose", class: "btn-primary"}, client.transpose.bind(client)),
+			// operation that ask for input
+			new Button("buttons", {text:"scale", class: "btn-primary"}, client.operationInput.bind(client, "scale")),
+			new Button("buttons", {text:"add", class: "btn-primary"}, client.operationInput.bind(client, "add")),
+			// modifies dataset
 			new Button("buttons", {text:"update", class: "btn-danger"}, client.datasetUpdate.bind(client)),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
