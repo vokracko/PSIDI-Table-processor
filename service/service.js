@@ -15,12 +15,13 @@ class Runnable {
 class Service extends Runnable {
 	constructor(config) {
 		super();
-		var workerManager=require("./workersManager.js");
+		var workerManager=require("../worker/workersManager.js");
 		var express = require('express');
-		var Worker = require("./worker.js");
+		//var Worker = require("./worker.js");
 		var dbAdapter = require("./dbadapter.js");
 		var bodyParser = require('body-parser')
 
+		this.workerT= new workerManager(config);
 		this.workers = [];
 		this.app = express();
 		this.db = new dbAdapter(config.db);
@@ -33,11 +34,11 @@ class Service extends Runnable {
 		});
 		this.app.use(bodyParser.json());
 
-		for(var i = 0; i < config.workers.length; ++i) {
+		/*for(var i = 0; i < config.workers.length; ++i) {
 			var workerConfig = config.workers[i];
 			var worker = new Worker(workerConfig); 
 			this.workers.push(worker);
-		}
+		}*/
 	}
 
 	start() {
@@ -68,7 +69,9 @@ class Service extends Runnable {
 			}
 
 			dbCall(1, function(err, rows) {
-				this.workerManager.callworker(query.action, scalar, rows, res);
+				//var workerManager1=require("../worker/workersManager.js");
+				console.log("im a worker");
+				this.workerT.callworker(req.query.action, scalar, rows, res, req);
 				/*this.workers[0].execute(
 					"/operation/" + req.query.action + scalar,
 					rows,

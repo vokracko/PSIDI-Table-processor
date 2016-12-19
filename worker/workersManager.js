@@ -4,12 +4,12 @@ class workersManager{
 
     constructor(config) {
         var express = require('express');
-        var Worker = require("./worker.js");
-        var dbAdapter = require("./dbadapter.js");
-        var bodyParser = require('body-parser')
+        var Worker = require("../service/worker.js");
+        var dbAdapter = require("../service/dbadapter.js");
+        var bodyParser = require('body-parser');
 
         this.workers = [];
-        var workersOther = [];
+        this.workersOther = [];
         this.app = express();
         this.db = new dbAdapter(config.db);
         this.port = config.port;
@@ -28,35 +28,51 @@ class workersManager{
         }
     }
 
-        callworker(query, scalar, rows, res){
-            workersOther.push(query, scalar, rows, res);
+    sendToWorker(work){
+        var action = work.req.query.action;
+        var scalar = work.scalar;
+        var rows = work.rows;
+        var self = this;
 
-            while(workersOther.length!= null){
-                sendToWorker();
+        for (var i = 0; i < this.workers.length; i++) {
+
+            // Check if worker is available
+            if(!this.workers[i].isBusy()){
+                // Make the worker execute this work
+                this.workers[i].execute(
+                    "/operation/" + action + scalar,
+                    rows,
+                    function (response) {
+                        res.send(response); // send -> response is already json
+                        // When the work is processed, remove it from work array
+                        self.workersOther = self.workersOther.filter(function(element) {
+                            return element.id !== work.id;
+                        });
+                    }
+                );
             }
 
         }
 
-        sendToWorker(){
-            for (var i = 0; i < workers.length; i++) {
-                if(!workers[i].isBusy()){
-                    workers[i].push(workersOther.first())
-                    this.workers[i].execute(
-                        "/operation/" + req.query.action + scalar,
-                        rows,
-                        function (response) {
-                            res.send(response); // send -> response is already json
 
-                            
-                        }
-                    );
-                }
+    }
+
+        callworker(query, scalar, rows, res,req){
+            var work = {id: +new Date(), query: query, scalar: scalar, rows: rows, res: res, req: req};
+            // Store the work
+            this.workersOther.push(work);
+
+            // While there is work to process, send to worker
+            while(this.workersOther.length!= 0){
+                this.sendToWorker(work);
 
             }
 
-
         }
+
+
 
 
 
 }
+module.exports=workersManager;

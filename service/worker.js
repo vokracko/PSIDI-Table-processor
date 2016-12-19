@@ -2,18 +2,19 @@
 
 class Worker {
 	constructor(config) {
+		console.log('service worker constructor');
 		if(!config.ip) {
 			config.ip = "localhost";
 		}
-		var isBusy_var=false;
+		this.isBusy_var=false;
 		
 		this.address = "http://" + config.ip + ':' + config.port;
 	}
 
 	execute(url, data, onReply) {
-
-		if (isBusy()===false){
-			this.isBusy=true;
+console.log('worker executed');
+		if (this.isBusy_var===false){
+			this.isBusy_var=true;
 			console.log("service.worker.execute", url, data);
 			var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 			var request = new XMLHttpRequest();
@@ -34,13 +35,9 @@ class Worker {
 	}
 
 	 isBusy(){
-
-		if(this.isBusy===false){
-			return true;
-
-		}else {
-			return false
-		}
+	 	console.log('is busy');
+		 this.isBusy_var = !this.isBusy_var;
+		return this.isBusy_var;
 	}
 
 }
