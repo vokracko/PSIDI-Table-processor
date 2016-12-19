@@ -15,6 +15,7 @@ class Runnable {
 class Service extends Runnable {
 	constructor(config) {
 		super();
+		var workerManager=require("./workersManager.js");
 		var express = require('express');
 		var Worker = require("./worker.js");
 		var dbAdapter = require("./dbadapter.js");
@@ -67,13 +68,14 @@ class Service extends Runnable {
 			}
 
 			dbCall(1, function(err, rows) {
-				this.workers[0].execute(
+				this.workerManager.callworker(query.action, scalar, rows, res);
+				/*this.workers[0].execute(
 					"/operation/" + req.query.action + scalar,
 					rows,
 					function(response) {
 						res.send(response); // send -> response is already json
 					}
-				);
+				);*/
 			}.bind(this));	
 		} else { // just send dataset
 			this.db.datasetGet(1, function(err, rows) {
