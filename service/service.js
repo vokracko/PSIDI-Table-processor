@@ -15,16 +15,15 @@ class Runnable {
 class Service extends Runnable {
 	constructor(config) {
 		super();
-		var workerManager=require("../worker/workersManager.js");
+		var WorkerManager=require("./workersManager.js");
 		var express = require('express');
-		//var Worker = require("./worker.js");
-		var dbAdapter = require("./dbadapter.js");
+		var DbAdapter = require("./dbadapter.js");
 		var bodyParser = require('body-parser')
 
-		this.workerT= new workerManager(config);
+		this.workerManager= new WorkerManager(config);
+		this.db = new DbAdapter(config.db);
 		this.workers = [];
 		this.app = express();
-		this.db = new dbAdapter(config.db);
 		this.port = config.port;
 
 		this.app.use(function(req, res, next) {
@@ -34,11 +33,6 @@ class Service extends Runnable {
 		});
 		this.app.use(bodyParser.json());
 
-		/*for(var i = 0; i < config.workers.length; ++i) {
-			var workerConfig = config.workers[i];
-			var worker = new Worker(workerConfig); 
-			this.workers.push(worker);
-		}*/
 	}
 
 	start() {
@@ -69,16 +63,8 @@ class Service extends Runnable {
 			}
 
 			dbCall(1, function(err, rows) {
-				//var workerManager1=require("../worker/workersManager.js");
 				console.log("im a worker");
-				this.workerT.callworker(req.query.action, scalar, rows, res, req);
-				/*this.workers[0].execute(
-					"/operation/" + req.query.action + scalar,
-					rows,
-					function(response) {
-						res.send(response); // send -> response is already json
-					}
-				);*/
+				this.workerManager.submitTask(req.query.action, scalar, rows, res, req);
 			}.bind(this));	
 		} else { // just send dataset
 			this.db.datasetGet(1, function(err, rows) {
