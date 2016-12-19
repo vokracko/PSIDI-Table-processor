@@ -43,7 +43,7 @@ class workersManager{
                     "/operation/" + action + scalar,
                     rows,
                     function (response) {
-                        res.send(response); // send -> response is already json
+                        work.res.send(response); // send -> response is already json
                         // When the work is processed, remove it from work array
                         self.workersOther = self.workersOther.filter(function(element) {
                             return element.id !== work.id;
