@@ -2,7 +2,6 @@
 
 class Worker {
 	constructor(config) {
-		console.log('service worker constructor');
 		if(!config.ip) {
 			config.ip = "localhost";
 		}
@@ -12,7 +11,6 @@ class Worker {
 	}
 
 	execute(url, data, onReply) {
-		console.log('worker executed');
 		console.log("service.worker.execute", url, data);
 		var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 		var request = new XMLHttpRequest();
@@ -25,6 +23,7 @@ class Worker {
 		}
 		request.setRequestHeader("Content-Type", "application/json");
 		request.send(JSON.stringify(data));
+		console.log("service.worker.execute exit")
 	}
 }
 

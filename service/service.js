@@ -48,6 +48,7 @@ class Service extends Runnable {
 	}
 
 	operation(req, res) {
+		console.log("service.operation enter")
 		if(req.query.action) { // something will be computed 
 			var dbCall;
 			var scalar = "";
@@ -61,16 +62,17 @@ class Service extends Runnable {
 			} else {
 				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
-
 			dbCall(1, function(err, rows) {
-				console.log("im a worker");
-				this.workerManager.submitTask(req.query.action, scalar, rows, res, req);
+				this.workerManager.taskSubmit(req.query.action, scalar, rows, res);
+				console.log("service.operation done");
 			}.bind(this));	
 		} else { // just send dataset
 			this.db.datasetGet(1, function(err, rows) {
 				res.json(rows); // json -> rows = array
 			});
 		}
+
+		console.log("service.operation exit");	
 	}
 
 	datasetUpdate(req, res) {

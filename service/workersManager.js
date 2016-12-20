@@ -26,7 +26,7 @@ class workersManager{
         }
     }
 
-    selectWorker() {
+    workerSelect() {
         for (var i = 0; i < this.workers.length; i++) {
             // Check if worker is available
             if(!this.workers[i].busy) {
@@ -39,46 +39,57 @@ class workersManager{
         return null;
     }
 
-    submitTask(action, scalar, rows, res, req) {
-        var worker = this.selectWorker();
-        var task = this.createTask(action, scalar, rows, res, req, worker);
+    taskSelect() {
+        return this.tasks.shift();
+    }
+
+    taskSubmit(action, scalar, rows, res) {
+        console.log("service.workerManager.submitTask enter");
+        var worker = this.workerSelect();
+        var task = this.taskCreate(action, scalar, rows, res, worker);
 
         if(worker) {
-            this.assignTask(worker, task, this.onDone.bind(this));
+            this.taskAssign(worker, task, this.onDone.bind(this));
         } else {
             this.tasks.push(task);    
+            console.log("pushing task"); 
         }
+        console.log("service.workerManager.submitTask exit");
+
+        // console.log("service.workerManager.submitTask:tasks", this.tasks);
+        // console.log("service.workerManager.submitTask:workers", this.workers);
     }
 
-    createTask(action, scalar, rows, res, req, worker){
-        return {id: +new Date(), action: action, scalar: scalar, rows: rows, res: res, req: req, worker: worker};
+    taskCreate(action, scalar, rows, res, worker){
+        return {id: +new Date(), action: action, scalar: scalar, rows: rows, res: res, worker: worker};
     }
 
-    assignTask(worker, task, onDone) {
+    taskAssign(worker, task, onDone) {
+        console.log("service.workerManager.assignTask enter");
+
         worker.execute(
             "/operation/" + task.action + task.scalar,
             task.rows,
             function (response) {
                 task.res.send(response);  // send -> response is already json
                 onDone(task);
+                console.log("task done");
             }
         );
+        console.log("service.workerManager.assignTask exit");
     }
 
     onDone(task) {
-        console.log(this.tasks);
-        console.log(this.workers);
-        this.tasks = this.tasks.filter(function(element) {
-            return element.id !== task.id;
-        });
-
-        var worker = task.worker;
-        var new_task = this.tasks.shift();
+        // console.log("service.workerManager.onDone:tasks", this.tasks);
+        // console.log("service.workerManager.onDone:workers", this.workers);
+        
+        var worker = task.worker; // reuse worker
+        var new_task = this.taskSelect();
 
         // there are tasks, pick one and stay busy
         if(new_task) {
             new_task.worker = worker;
-            this.assignTask(worker, new_task, this.onDone.bind(this));
+            this.taskAssign(worker, new_task, this.onDone.bind(this));
         } else { // no tasks, not busy anymore
             task.worker.busy = false;
         }
