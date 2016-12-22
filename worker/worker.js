@@ -4,11 +4,11 @@ class Worker {
 
 	constructor(config) {
 		var express = require('express');
-		var sleep = require('sleep'); 
+	//	var sleep = require('sleep');
 		var bodyParser = require('body-parser');
 
 		this.app = express();
-		this.sleep = sleep.sleep.bind(null, config.sleep);
+	//	this.sleep = sleep.sleep.bind(null, config.sleep);
 		this.port = config.port;
 
 		this.app.use(function(req, res, next) {
@@ -20,7 +20,7 @@ class Worker {
 	}
 
 	execute(operation, req, res) {
-		this.sleep();
+	//	this.sleep();
 
 		if(!req.body) {
 			res.send("Invalid data");
