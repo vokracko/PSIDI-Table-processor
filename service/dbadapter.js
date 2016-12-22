@@ -113,10 +113,11 @@ class DbAdapter {
 
 		for(var i = 0; i < operations.length; ++i) {
 			var op = operations[i];
-			values.push(this.util.format('(NULL, %d, %s, %f) ', macro_id, op.url, op.data));
+	values.push(this.util.format('(NULL, %d, "%s", NULL) ', macro_id, op));//.url, op.data));
 		}
 
 		sql += values.join(', ');
+		console.log(sql, operations, macro_id);
 		return sql;
 	}
 
@@ -125,12 +126,12 @@ class DbAdapter {
 			if(err) {
 				callback(err, false);
 			} else {
-				var macro_id = result.insertID;
+				var macro_id = result.insertId;
 				this.connection.query(this.operationInsertPrepare(macro_id, operations), function(err, result) {
 					callback(err, result);
 				});
 			}
-		});
+		}.bind(this));
 	}
 
 	macroList(user_id, callback) {

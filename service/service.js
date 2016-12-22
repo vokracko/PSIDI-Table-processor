@@ -42,6 +42,11 @@ class Service extends Runnable {
 		this.app.get("/user/dataset/1", this.authorize.bind(this, this.datasetGet)); 
 		this.app.post("/user/dataset/1", this.authorize.bind(this, this.datasetPost)); // update
 		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
+
+		this.app.get("/user/dataset/1", this.operation.bind(this));
+	//	this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
+		this.app.get("/user/macro", this.macroList.bind(this));
+		this.app.post("user/macro", this.macroCreate.bind(this));
 		this.app.listen(this.port);
 	}
 
@@ -73,9 +78,14 @@ class Service extends Runnable {
 	}
 
 	datasetGet(req, res) {
-		var dataset_id = 1; // TODO dynamic from request
-		console.log("service.datasetGet enter")
-		if(req.query.action) { // something will be computed 
+        var dataset_id = 1; // TODO dynamic from request
+        console.log("service.datasetGet enter");
+
+    }
+
+    operation(req, res) {
+		if(req.query.action) { // something will be computed
+
 			var dbCall;
 			var scalar = "";
 
@@ -119,6 +129,7 @@ class Service extends Runnable {
 		} 
 		else { // just send dataset
 			this.db.datasetGet(dataset_id, function(err, rows) {
+
 				res.json(rows); // json -> rows = array
 			});
 		}
@@ -178,6 +189,20 @@ class Service extends Runnable {
 			}
 		});
 	}
+	macroCreate(req,res){
+		var name=req.body.name;
+		var ops= req.body.operations;
+		console.log(req.body);
+		this.db.macroCreate(1,name,ops,function (err,result) {
+			res.status(200).send();
+        });
+	}
+
+	macroList(req,res){
+		this.db.macroList(1, function(err,result){
+			res.json(result);
+        });
+    }
 }
 
 module.exports = Service;
