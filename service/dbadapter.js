@@ -113,7 +113,7 @@ class DbAdapter {
 
 		for(var i = 0; i < operations.length; ++i) {
 			var op = operations[i];
-	values.push(this.util.format('(NULL, %d, "%s", NULL) ', macro_id, op));//.url, op.data));
+			values.push(this.util.format('(NULL, %d, "%s", NULL) ', macro_id, op));//.url, op.data));
 		}
 
 		sql += values.join(', ');

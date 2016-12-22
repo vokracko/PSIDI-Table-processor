@@ -39,12 +39,11 @@ class Service extends Runnable {
 
 	start() {
 		this.app.post("/user/", this.userPost.bind(this)); // login
+
 		this.app.get("/user/dataset/1", this.authorize.bind(this, this.datasetGet)); 
 		this.app.post("/user/dataset/1", this.authorize.bind(this, this.datasetPost)); // update
 		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
 
-		this.app.get("/user/dataset/1", this.operation.bind(this));
-	//	this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
 		this.app.get("/user/macro", this.macroList.bind(this));
 		this.app.post("user/macro", this.macroCreate.bind(this));
 		this.app.listen(this.port);
@@ -77,13 +76,10 @@ class Service extends Runnable {
 			operation == "add";
 	}
 
-	datasetGet(req, res) {
-        var dataset_id = 1; // TODO dynamic from request
-        console.log("service.datasetGet enter");
+    datasetGet(req, res) {
+    	var dataset_id = 1; // TODO dynamic from request
+    	console.log("service.datasetGet enter");
 
-    }
-
-    operation(req, res) {
 		if(req.query.action) { // something will be computed
 
 			var dbCall;
