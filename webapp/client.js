@@ -43,6 +43,7 @@ class Client {
 
 				client.token = JSON.parse(response).token;
 				client.flashMessage("Login successful", "success");
+				client.datasetGet();
 			}
 		);
 	}
