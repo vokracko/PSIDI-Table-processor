@@ -35,6 +35,7 @@ class Service extends Runnable {
 		});
 		this.app.use(bodyParser.json());
 
+<<<<<<< 3fe20bab05770a42b512be5a1011ea8e9e3b3c6c
 	}
 
 	start() {
@@ -42,6 +43,20 @@ class Service extends Runnable {
 		this.app.get("/user/dataset/1", this.authorize.bind(this, this.datasetGet)); 
 		this.app.post("/user/dataset/1", this.authorize.bind(this, this.datasetPost)); // update
 		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
+=======
+		/*for(var i = 0; i < config.workers.length; ++i) {
+			var workerConfig = config.workers[i];
+			var worker = new Worker(workerConfig);
+			this.workers.push(worker);
+		}*/
+	}
+
+	start() {
+		this.app.get("/user/dataset/1", this.operation.bind(this));
+		this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
+		this.app.get("/user/macro", this.macroList.bind(this));
+		this.app.post("user/macro", this.macroCreate.bind(this));
+>>>>>>> 1cb25b1452dce16c5718a8ca5c89b1a30549e3d5
 		this.app.listen(this.port);
 	}
 
@@ -72,10 +87,15 @@ class Service extends Runnable {
 			operation == "add";
 	}
 
+<<<<<<< 3fe20bab05770a42b512be5a1011ea8e9e3b3c6c
 	datasetGet(req, res) {
 		var dataset_id = 1; // TODO dynamic from request
 		console.log("service.datasetGet enter")
 		if(req.query.action) { // something will be computed 
+=======
+	operation(req, res) {
+		if(req.query.action) { // something will be computed
+>>>>>>> 1cb25b1452dce16c5718a8ca5c89b1a30549e3d5
 			var dbCall;
 			var scalar = "";
 
@@ -88,6 +108,7 @@ class Service extends Runnable {
 			} else {
 				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
+<<<<<<< 3fe20bab05770a42b512be5a1011ea8e9e3b3c6c
 			dbCall(dataset_id, function(err, rows) {
 				this.workerManager.taskSubmit(req.query.action, scalar, rows, res);
 				console.log("service.operation done");
@@ -119,6 +140,23 @@ class Service extends Runnable {
 		} 
 		else { // just send dataset
 			this.db.datasetGet(dataset_id, function(err, rows) {
+=======
+
+			dbCall(1, function(err, rows) {
+				//var workerManager1=require("../worker/workersManager.js");
+				console.log("im a worker");
+				this.workerT.callworker(req.query.action, scalar, rows, res, req);
+				/*this.workers[0].execute(
+					"/operation/" + req.query.action + scalar,
+					rows,
+					function(response) {
+						res.send(response); // send -> response is already json
+					}
+				);*/
+			}.bind(this));
+		} else { // just send dataset
+			this.db.datasetGet(1, function(err, rows) {
+>>>>>>> 1cb25b1452dce16c5718a8ca5c89b1a30549e3d5
 				res.json(rows); // json -> rows = array
 			});
 		}
@@ -132,6 +170,7 @@ class Service extends Runnable {
 			res.status(200).send();
 		});
 	}
+<<<<<<< 3fe20bab05770a42b512be5a1011ea8e9e3b3c6c
 
 	datasetPut(req, res) {
 		console.log("service.datasetPut", req.body);
@@ -178,6 +217,22 @@ class Service extends Runnable {
 			}
 		});
 	}
+=======
+	macroCreate(req,res){
+		var name=req.body.name;
+		var ops= req.body.operations;
+		console.log(req.body);
+		this.db.macroCreate(1,name,ops,function (err,result) {
+			res.status(200).send();
+        });
+	}
+
+	macroList(req,res){
+		this.db.macroList(1, function(err,result){
+			res.json(result);
+        });
+    }
+>>>>>>> 1cb25b1452dce16c5718a8ca5c89b1a30549e3d5
 }
 
 module.exports = Service;

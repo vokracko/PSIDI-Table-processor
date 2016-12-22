@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Marjoška datasets</title>
+	<script type="text/javascript" src="renderable.js"></script>
+	<script type="text/javascript" src="renderer.js"></script>
+	<script type="text/javascript" src="client.js"></script>
+
+	<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="overlay-container">
+	</div>
+	<div id="container">
+		<div id="dataset">
+			<div id="buttons">
+			</div>
+			<div id="table">
+			</div>
+		</div>
+		<div id="form">
+			<!--
+			<form">
+				<label for="username">Username</label><input name="username" type="text"><br>
+				<label for="password">Password</label><input name="password" type="password"><br>
+				<input name="login" value="Login" type="submit">
+			</form>
+			 -->	
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		var renderer = new Renderer()
+		var table = new Table("table", null, null);
+		var overlay = new Overlay("overlay-container", {text: "It works!", id: "overlay"});
+		var client = new Client("localhost", 4321, renderer, table);
+		var items = [
+			table,
+			overlay,
+			new Button("buttons", {text:"count", class: "btn-primary"}, client.operation.bind(client, "count")), //prepares as client.operation(client, "count");
+			new Button("buttons", {text:"sum", class: "btn-primary"}, client.operation.bind(client, "sum")),
+			new Button("buttons", {text:"mean", class: "btn-primary"}, client.operation.bind(client, "mean")),
+			new Button("buttons", {text:"median", class: "btn-primary"}, client.operation.bind(client, "median")),
+			new Button("buttons", {text:"mode", class: "btn-primary"}, client.operation.bind(client, "mode")),
+			new Button("buttons", {text:"midrange", class: "btn-primary"}, client.operation.bind(client, "midrange")),
+			new Button("buttons", {text:"variance", class: "btn-primary"}, client.operation.bind(client, "variance")),
+			new Button("buttons", {text:"stdev", class: "btn-primary"}, client.operation.bind(client, "stdev")),
+			new Button("buttons", {text:"transpose", class: "btn-primary"}, client.transpose.bind(client)),
+			// operation that ask for input
+			new Button("buttons", {text:"scale", class: "btn-primary"}, client.operationInput.bind(client, "scale")),
+			new Button("buttons", {text:"add", class: "btn-primary"}, client.operationInput.bind(client, "add")),
+			// modifies dataset
+			new Button("buttons", {text:"update", class: "btn-danger"}, client.datasetUpdate.bind(client)),
+			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			//new Button("buttons", {text:"get macros", class: "btn-primary"}, client.macroList.bind(client)),
+			//new Button("buttons", {text:"create macros",class:"btn-primary"}, client.macroCreate.bind(client))
+		];
+
+		renderer.addItems(items);
+		renderer.setOverlay(overlay);
+		renderer.renderItems();
+
+		client.datasetGet();
+
+	</script>
+</body>
+</html> -->

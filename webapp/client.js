@@ -1,5 +1,5 @@
 "use strict";
-
+//sends into Service
 class Client {
 	constructor(ip, port, renderer, datasource) {
 		this.address = "http://" + ip + ":" + port;
@@ -212,6 +212,7 @@ class Client {
 	}
 
 	renderTable(response) {
+		console.log(response);
 		var data = JSON.parse(response);
 		this.datasource.setData(data);
 		this.renderer.renderItems();
@@ -220,6 +221,34 @@ class Client {
 	flashMessage(text, type) {
 		this.renderer.flashMessage(text, type);
 	}
+
+	macroList(){
+		console.log("client macroList");
+		this.sendRequest(
+			"get",
+			"/user/macro",
+			null,
+			this.log.bind(this)
+		);
+
+	}
+
+	macroCreate(){
+		console.log("client macroCreate");
+		var name = prompt("macro name", "dsf");
+		var ops= prompt("macro operations list. ex:[\"/user/dataset/1?action=count\" ,\"/user/dataset/1?action=sum\"]", "[\"/user/dataset/1?action=count\",\"/user/dataset/1?action=sum\",\"/user/dataset/1?action=median\"]");
+		var obj={'name':name, 'operations':JSON.parse(ops)};
+		this.sendRequest(
+			"post", //bc joel said so XD
+			"/user/macro",
+			obj,
+			this.log.bind(this)
+
+
+		);
+
+	}
+
 }
 
 
