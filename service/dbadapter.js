@@ -38,13 +38,13 @@ class DbAdapter {
 			if(err) {
 				callback(err, false);
 			} else {
-				var dataset_id = result.insertID;
+				var dataset_id = result.insertId;
 				this.connection.query(this.cellInsertPrepare(dataset_id, data), function(err, result) {
 					callback(err, result);
-				});
+				}.bind(this));
 			}
 
-		});
+		}.bind(this));
 	}
 
 	datasetUpdate(dataset_id, data, callback) {
@@ -97,7 +97,7 @@ class DbAdapter {
  
 	userCreate(email, password, callback) {
 		this.connection.query('INSERT INTO user VALUES (NULL, ?, sha1(?))', [email, password], function(err, result) {
-			callback(err, result.insertID);
+			callback(err, result.insertId);
 		});
 	}
 
@@ -113,7 +113,7 @@ class DbAdapter {
 
 		for(var i = 0; i < operations.length; ++i) {
 			var op = operations[i];
-			values.push(this.util.format('(NULL, ?, ?, ?) ', macro_id, op.url, op.data));
+			values.push(this.util.format('(NULL, %d, %s, %f) ', macro_id, op.url, op.data));
 		}
 
 		sql += values.join(', ');
