@@ -19,8 +19,9 @@ class Service extends Runnable {
 		var express = require('express');
 		var DbAdapter = require("./dbadapter.js");
 		var bodyParser = require('body-parser')
-
-		this.workerManager= new WorkerManager(config);
+		
+		this.ioconverters = require('./ioconverter.js');
+		this.workerManager = new WorkerManager(config);
 		this.db = new DbAdapter(config.db);
 		this.workers = [];
 		this.app = express();
@@ -29,6 +30,7 @@ class Service extends Runnable {
 		this.app.use(function(req, res, next) {
 		  res.header("Access-Control-Allow-Origin", "*");
 		  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+		  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 		  next();
 		});
 		this.app.use(bodyParser.json());
@@ -36,8 +38,9 @@ class Service extends Runnable {
 	}
 
 	start() {
-		this.app.get("/user/dataset/1", this.operation.bind(this));
-		this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
+		this.app.get("/user/dataset/1", this.datasetGet.bind(this));
+		this.app.post("/user/dataset/1", this.datasetPost.bind(this));
+		this.app.put("/user/dataset/", this.datasetPut.bind(this));
 		this.app.listen(this.port);
 	}
 
@@ -47,8 +50,9 @@ class Service extends Runnable {
 			operation == "add";
 	}
 
-	operation(req, res) {
-		console.log("service.operation enter")
+	datasetGet(req, res) {
+		var dataset_id = 1; // TODO dynamic from request
+		console.log("service.datasetGet enter")
 		if(req.query.action) { // something will be computed 
 			var dbCall;
 			var scalar = "";
@@ -62,24 +66,79 @@ class Service extends Runnable {
 			} else {
 				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
-			dbCall(1, function(err, rows) {
+			dbCall(dataset_id, function(err, rows) {
 				this.workerManager.taskSubmit(req.query.action, scalar, rows, res);
 				console.log("service.operation done");
 			}.bind(this));	
-		} else { // just send dataset
-			this.db.datasetGet(1, function(err, rows) {
+		} else if(req.query.format) { // export
+			this.db.datasetGet(dataset_id, function(err, rows) {
+				var converter;
+
+				switch(req.query.format) {
+					case 'xml': converter = new this.ioconverters.XML(); break;
+					case 'csv': converter = new this.ioconverters.CSV(); break;
+					case 'json': converter = new this.ioconverters.JSON(); break;
+				}
+
+				if(!converter) {
+					res.status(400).send();
+					return;
+				}
+
+				var data = converter.fromJSON(rows);
+
+				if(!data) {
+					res.status(400).send(); // TODO correct code
+					return;
+				}
+				
+				res.json({data: data, format: req.query.format});
+			}.bind(this));
+		} 
+		else { // just send dataset
+			this.db.datasetGet(dataset_id, function(err, rows) {
 				res.json(rows); // json -> rows = array
 			});
 		}
 
-		console.log("service.operation exit");	
+		console.log("service.datasetGet exit");	
 	}
 
-	datasetUpdate(req, res) {
-		console.log("service.datasetUpdate", req.body);
+	datasetPost(req, res) {
+		console.log("service.post", req.body);
 		this.db.datasetUpdate(1, req.body, function(err, result) {
 			res.status(200).send();
 		});
+	}
+
+	datasetPut(req, res) {
+		console.log("service.datasetPut", req.body);
+		var arr = req.body.filename.split('.');
+		var ext = arr[arr.length-1];
+		var converter;
+		var data;
+
+		switch(ext) {
+			case 'xml': converter = new this.ioconverters.XML(); break;
+			case 'csv': converter = new this.ioconverters.CSV(); break;
+			case 'json': converter = new this.ioconverters.JSON(); break;
+		}
+
+		if(!converter) {
+			res.status(400).send();
+			return;
+		}
+
+		data = converter.toJSON(req.body.data);
+
+		if(!data) {
+			res.status(400).send(); // TODO correct code
+			return;
+		}
+
+		this.db.datasetCreate(1, "dataset name", data, function(err, result) {
+			res.json({errors: err, result: result});
+		})
 	}
 }
 

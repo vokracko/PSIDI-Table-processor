@@ -5,6 +5,7 @@ class Client {
 		this.address = "http://" + ip + ":" + port;
 		this.renderer = renderer;
 		this.datasource = datasource;
+		this.btnUpload = null;
 	}
 
 	sendRequest(method, url, data, onReply) {
@@ -31,13 +32,77 @@ class Client {
 		var dataset_id = 1; // TODO actual dataset number
 		var scope = "dataset"; // TODO row/col/ + index
 
-		// TOOD if scope => jina adresa
+		// TOOD if scope => diferent uri
 		this.sendRequest(
 			"get", 
 			"/user/dataset/" + dataset_id + "?action=" + operation,
 			null,
 			this.log.bind(this)
 		);
+	}
+
+	import() {
+		this.btnUpload = new Input("overlay", {type:"file", onchange: this.upload.bind(this)}, function(){});
+		this.renderer.overlay.setData({text: "", type: "success"});
+		this.renderer.overlay.render();
+		this.btnUpload.render();
+	}
+
+	upload() {
+		var file = this.btnUpload.element.files.item(0);
+		var cb = this.log.bind(this);
+		var reader = new FileReader();
+		var client = this;
+		reader.onload = function(){
+			console.log("reading");
+			if(reader.readyState == 2) {// DONE
+				console.log(reader.result);
+				client.sendRequest(
+					"put",
+					"/user/dataset/",
+					{data:reader.result, filename: file.name},
+					function(result) {
+						var json = JSON.parse(result);
+						// TODO result.status code has error info too
+						if(json.errors) {
+							client.flashMessage("Bad format", "erorr");
+						} else {
+							client.flashMessage("Dataset saved");
+							// TODO Get ID
+							// TODO show that dataset
+						}
+					}
+				);
+			}
+		};
+
+		reader.readAsText(file);
+	}
+
+	export(format) {
+		var dataset_id = 1; // TODO actual dataset number
+		this.sendRequest(
+			"get",
+			"/user/dataset/" + dataset_id + "?format=" + format,
+			null,
+			this.save.bind(this)
+		);
+	}
+
+	save(result) {
+		result = JSON.parse(result);
+		var mimeType;
+		var ext;
+		var filename = "dataset";
+
+		switch(result.format) {
+			case 'xml': mimeType = 'text/xml'; ext = 'xml'; break;
+			case 'json': mimeType = 'application/json'; ext = 'json'; break;
+			case 'csv': mimeType = 'text/csv'; ext = 'csv'; break;
+		}
+
+		var blob = new Blob([result.data], {type: mimeType + ";charset=utf-8"});
+		saveAs(blob, filename + '.' + ext);
 	}
 
 	selected() {

@@ -6,6 +6,7 @@
 	<script type="text/javascript" src="renderable.js"></script>
 	<script type="text/javascript" src="renderer.js"></script>
 	<script type="text/javascript" src="client.js"></script>
+	<script type="text/javascript" src="filesaver.js"></script>
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="style.css">
@@ -15,6 +16,8 @@
 	</div>
 	<div id="container">
 		<div id="dataset">
+			<div id="buttons-top">
+			</div>
 			<div id="buttons">
 			</div>
 			<div id="table">
@@ -56,6 +59,10 @@
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
+			new Button("buttons-top", {text:"Save as CSV", class: "btn"}, client.export.bind(client, "csv")),
+			new Button("buttons-top", {text:"Save as XML", class: "btn"}, client.export.bind(client, "xml")),
+			new Button("buttons-top", {text:"Save as JSON", class: "btn"}, client.export.bind(client, "json")),
 		];
 
 		renderer.addItems(items);

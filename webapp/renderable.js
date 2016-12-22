@@ -197,3 +197,12 @@ class Overlay extends Renderable {
 		super.render();
 	}
 }
+
+class Input extends Renderable {
+	constructor(location, data, callback) {
+		super("input", location);
+		this.element.onchange = data.onchange;
+		this.element.type = data.type;
+		this.element.onclick = callback;
+	}
+}
