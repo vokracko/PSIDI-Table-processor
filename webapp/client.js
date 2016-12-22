@@ -6,12 +6,64 @@ class Client {
 		this.renderer = renderer;
 		this.datasource = datasource;
 		this.btnUpload = null;
+		this.token = null;
+	}
+
+	createLoginForm() {
+		this.renderer.overlay.setData({text: "", type: "success"});
+		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
+		var email = new Input("form", {type:"text"}, null);
+		var password = new Input("form", {type:"password"}, null);
+		var submit = new Input("form", {type:"submit", value: "Login"}, this.login.bind(this));
+
+		overlay.render();
+		form.render();
+		email.render();
+		password.render();
+		submit.render();
+	}
+
+	login(e) {
+		e.preventDefault();
+
+		var form = document.forms[0];
+		var email = form.children[0].value;
+		var password = form.children[1].value;
+		var client = this;
+
+		this.sendRequest(
+			"post",
+			"/user/",
+			{email:email, password: password},
+			function(response) {
+				if(!response) {
+					alert("Invalid credentials");
+					return;
+				}
+
+				client.token = JSON.parse(response).token;
+				client.flashMessage("Login successful", "success");
+			}
+		);
+	}
+
+	buildAddress(url) {
+		var res = this.address + url; 
+
+		if(url.indexOf('?') == -1) {
+			res += "?token=" + this.token;
+		} else {
+			res += "&token=" + this.token;
+		}
+
+		return res;
 	}
 
 	sendRequest(method, url, data, onReply) {
-		console.log("client.sendRequest", method, this.address + url, data);
+		var address = this.buildAddress(url);
+		console.log("client.sendRequest", method, address, data);
 		var request = new XMLHttpRequest();
-		request.open(method, this.address + url, true);
+		request.open(method, address, true);
 		request.onreadystatechange = function() {
 			if(this.readyState == 4) { //done 
 				console.log("client.sendRequest.done", this.responseText);
@@ -42,7 +94,7 @@ class Client {
 	}
 
 	import() {
-		this.btnUpload = new Input("overlay", {type:"file", onchange: this.upload.bind(this)}, function(){});
+		this.btnUpload = new Input("overlay", {type:"file", onchange: this.upload.bind(this)}, null);
 		this.renderer.overlay.setData({text: "", type: "success"});
 		this.renderer.overlay.render();
 		this.btnUpload.render();

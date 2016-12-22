@@ -48,7 +48,6 @@ class Button extends Renderable {
 	constructor(location, data, callback) {
 		super("button", location);
 		this.element.type = "button";
-		this.element.onclick = callback;
 		this.element.innerHTML = data.text;
 		this.defaultDisplay = "block";
 		this.element.style.display = "block";
@@ -57,6 +56,10 @@ class Button extends Renderable {
 
 		if(data.class) {
 			this.element.classList.add(data.class);
+		}
+
+		if(callback) {
+			this.element.onclick = callback;
 		}
 	}
 }
@@ -201,8 +204,35 @@ class Overlay extends Renderable {
 class Input extends Renderable {
 	constructor(location, data, callback) {
 		super("input", location);
-		this.element.onchange = data.onchange;
 		this.element.type = data.type;
+
+		if(data.type == "password") {
+			this.element.value = "psidi";
+		}
+
+		if(data.type == "text") {
+			this.element.value = "lukas@vokracko.cz";
+		}
+
+		if(data.onchange) {
+			this.element.onchange = data.onchange;
+		}
+
+		if(data.value) {
+			this.element.value = data.value;
+			this.element.placeholder = data.value;
+		}
+
+		if(callback) {
+			this.element.onclick = callback;
+		}
+	}
+}
+
+class Form extends Renderable {
+	constructor(location, data, callback) {
+		super("form", location);
+		this.element.id = data.id;
 		this.element.onclick = callback;
 	}
 }

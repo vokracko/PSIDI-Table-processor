@@ -88,9 +88,9 @@ class DbAdapter {
 		});
 	}
 
-	datasetOwns(id, email, callback) {
-		this.connection.query('SELECT COUNT(*) as res FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE dataset.id = ? AND user.email = ?', [id, email], function(err, rows, fileds) {
-			callback(err, rows[0].res);
+	authorize(token, id, callback) {
+		this.connection.query('SELECT * FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE dataset.id = ? AND user.password = ?', [id, token], function(err, rows, fileds) {
+			callback(err, rows);
 		});
 	}
 
@@ -102,13 +102,13 @@ class DbAdapter {
 	}
 
 	userValidate(email, password, callback) {
-		this.connection.query('SELECT COUNT(*) as res FROM user WHERE email = ? AND password = sha1(?)', [email, password], function(err, rows, fields) {
-			callback(err, rows[0].res);
+		this.connection.query('SELECT password AS token FROM user WHERE email = ? AND password = sha1(?)', [email, password], function(err, rows, fields) {
+			callback(err, rows.length ? rows[0].token : null);
 		});
 	}
 
 	operationInsertPrepare(macro_id, operations) {
-		var sql = 'INESRT INTO operation VALUES ';
+		var sql = 'INSERT INTO operation VALUES ';
 		var values = [];
 
 		for(var i = 0; i < operations.length; ++i) {

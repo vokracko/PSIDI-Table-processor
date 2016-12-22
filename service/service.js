@@ -38,10 +38,32 @@ class Service extends Runnable {
 	}
 
 	start() {
-		this.app.get("/user/dataset/1", this.datasetGet.bind(this));
-		this.app.post("/user/dataset/1", this.datasetPost.bind(this));
-		this.app.put("/user/dataset/", this.datasetPut.bind(this));
+		this.app.post("/user/", this.userPost.bind(this)); // login
+		this.app.get("/user/dataset/1", this.authorize.bind(this, this.datasetGet)); 
+		this.app.post("/user/dataset/1", this.authorize.bind(this, this.datasetPost)); // update
+		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
 		this.app.listen(this.port);
+	}
+
+	authorize(cb, req, res) {
+		var dataset_id = 1; // TODO
+		if(!req.query.token) {
+			res.status(400) // TODO code
+			return;
+		}
+
+		var cb = cb.bind(this, req, res);
+
+		this.db.authorize(req.query.token, dataset_id, function(err, result) {
+			console.log("service.authorize result", result);
+			if(err || result.length == 0) {
+				console.log("service.authorize error", err);
+				res.status(400); // TODO code
+				return;
+			}
+
+			cb();
+		})
 	}
 
 	isComplex(operation) {
@@ -139,6 +161,22 @@ class Service extends Runnable {
 		this.db.datasetCreate(1, "dataset name", data, function(err, result) {
 			res.json({errors: err, result: result});
 		})
+	}
+
+	userPost(req, res) {
+		if(!req.body.email || !req.body.password) {
+			res.status(400).send();
+			return;
+		}
+
+		this.db.userValidate(req.body.email, req.body.password, function(err, result) {
+			if(err || !result) {
+				res.status(400).send(); // TODO code
+				return;
+			} else {
+				res.json({token: result});
+			}
+		});
 	}
 }
 
