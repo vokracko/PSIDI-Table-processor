@@ -7,5 +7,8 @@
 		"mysql": "latest",
 		"xmlhttprequest": "latest",
 		"body-parser": "latest"
+	},
+	"scripts": {
+		"start": "node run.js"
 	}
 }

@@ -94,7 +94,7 @@ class IOconverter {
 			return false;
 		}
 
-		return json;
+		return this.validate(json) ? json : null;
 	}
 
 }
@@ -143,3 +143,9 @@ function numberChar(charCode) {
 	// . or 0-9
 	return charCode == 46 || (charCode >= 48 && charCode <= 57);
 }
+
+module.exports = {
+	XML: XML,
+	CSV: CSV,
+	JSON: JSON
+};
