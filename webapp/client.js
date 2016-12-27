@@ -222,10 +222,11 @@ class Client {
 	}
 
 
-	createLoginForm(){
+	registrationForm(){
 
 		var x = document.getElementById("formNewUser");
 		var createform = document.createElement('form'); // Create New Element Form
+		createform.setAttribute("class", "formUser")
 
 		var label1=document.createElement("label");
 		var label1Text=document.createTextNode("Email");
@@ -279,14 +280,6 @@ class Client {
 
 		x.appendChild(createform);
 
-/*
-		<label>Email</label><input name="email" type="text" required><br>
-		<label>Password</label><input name="password" type="password" required><br>
-		<button name="login"   onclick="client.createNewUser()">Creat New User</button>
-
- 		<button type="button" onclick="alert('Hello world!')">Click Me!</button>
-
-*/
 
 
 	}
@@ -301,26 +294,15 @@ class Client {
 
 		var data = [textEmail, textPassword];
 		this.sendRequest("post", "/user/", data, this.flashMessage.bind(this, "User created", "success"));
+		var x = document.getElementById("formNewUser");
+		x.innerHTML=" "
 
-/*
-		if(DbAdapter.userValidate( textEmail, textPassword,callback)){
-			DbAdapter.userCreate(textEmail, textPassword,callback);
-		}
-*/
 
-		//alert(textEmail);
 
 
 
 	}
 
-	/*
-	email
-	password
-	* - button create user -> shows form: (email, pass, pass repeat, submit button)
-	 - button login -> show client.createLoginForm
-	 - INSPIRATION: client.createLoginForm
-	* */
 }
 
 

@@ -72,7 +72,7 @@
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 
-			new Button("buttons", {text:"create user", class: "btn-primary"}, client.createLoginForm()),
+			new Button("buttons", {text:"create user", class: "btn-primary"}, client.registrationForm.bind(client)),
 
 			new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
 			new Button("buttons-top", {text:"Save as CSV", class: "btn"}, client.export.bind(client, "csv")),
@@ -84,9 +84,6 @@
 		renderer.addItems(items);
 		renderer.setOverlay(overlay);
 		renderer.renderItems();
-
-		//client.createLoginForm();
-		// client.datasetGet();
 
 	</script>
 </body>
