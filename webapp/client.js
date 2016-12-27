@@ -220,6 +220,30 @@ class Client {
 	flashMessage(text, type) {
 		this.renderer.flashMessage(text, type);
 	}
+
+	macroList(){
+		this.sendRequest('get', '/user/macro', null, this.log.bind(this));
+	}
+
+	macroCreate(){
+		console.log('macro create');
+		//console.log(JSON.parse('"/user/dataset/1?action=count"'));
+		var name= prompt('macro name', 'dsf');
+		var ops= prompt('macro operations list ex:[\"/user/dataset/1?action=count\" ,\"/user/dataset/1?action=sum\"]', ['["/user/dataset/1?action=count","/user/dataset/1?action=sum"]']);
+		//var obj={'name':name, 'operations':'/user/dataset/1?action=count'};
+
+        var obj={'name':name, 'operations':JSON.parse(ops)};
+        console.log(obj.operations);
+		this.sendRequest(
+        	"post", //bc joel said so XD
+        	"/user/macro",
+   			obj,
+   			this.log.bind(this)
+
+			);
+
+	}
+
 }
 
 

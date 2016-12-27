@@ -45,7 +45,7 @@ class Service extends Runnable {
 		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
 
 		this.app.get("/user/macro", this.macroList.bind(this));
-		this.app.post("user/macro", this.macroCreate.bind(this));
+		this.app.post("/user/macro", this.macroCreate.bind(this));
 		this.app.listen(this.port);
 	}
 
@@ -188,6 +188,7 @@ class Service extends Runnable {
 	macroCreate(req,res){
 		var name=req.body.name;
 		var ops= req.body.operations;
+		console.log("heererer");
 		console.log(req.body);
 		this.db.macroCreate(1,name,ops,function (err,result) {
 			res.status(200).send();

@@ -63,6 +63,8 @@
 			new Button("buttons-top", {text:"Save as CSV", class: "btn"}, client.export.bind(client, "csv")),
 			new Button("buttons-top", {text:"Save as XML", class: "btn"}, client.export.bind(client, "xml")),
 			new Button("buttons-top", {text:"Save as JSON", class: "btn"}, client.export.bind(client, "json")),
+			new Button("buttons", {text:'get macros', class: 'btn-primary'}, client.macroList.bind(client)),
+			new Button("buttons", {text: 'create macros', class: 'btn-primary'}, client.macroCreate.bind(client)),
 		];
 
 		renderer.addItems(items);

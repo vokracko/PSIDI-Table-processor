@@ -111,12 +111,14 @@ class DbAdapter {
 		var sql = 'INSERT INTO operation VALUES ';
 		var values = [];
 
+
 		for(var i = 0; i < operations.length; ++i) {
 			var op = operations[i];
-			values.push(this.util.format('(NULL, %d, "%s", NULL) ', macro_id, op));//.url, op.data));
+			console.log(op);
+			values.push(this.util.format('(NULL, %d, "%s", \'\') ', macro_id, op));//.url, op.data));
 		}
 
-		sql += values.join(', ');
+		sql += values.join(',');
 		console.log(sql, operations, macro_id);
 		return sql;
 	}
