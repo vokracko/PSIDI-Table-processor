@@ -29,6 +29,18 @@
 			</form>
 			 -->	
 		</div>
+
+	</div>
+	<div id="formNewUser" >
+
+
+		<!--
+        <form>
+            <label>Email</label><input name="email" type="text" required><br>
+            <label>Password</label><input name="password" type="password" required><br>
+            <button name="login"   onclick="client.createNewUser()">Creat New User</button>
+        </form>
+        -->
 	</div>
 
 	<script type="text/javascript">
@@ -56,6 +68,7 @@
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
 			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			new Button("buttons", {text:"create user", class: "btn-primary"}, client.createLoginForm()),
 		];
 
 		renderer.addItems(items);

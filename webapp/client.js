@@ -102,6 +102,107 @@ class Client {
 	flashMessage(text, type) {
 		this.renderer.flashMessage(text, type);
 	}
+
+
+	createLoginForm(){
+
+		var x = document.getElementById("formNewUser");
+		var createform = document.createElement('form'); // Create New Element Form
+
+		var label1=document.createElement("label");
+		var label1Text=document.createTextNode("Email");
+		label1.appendChild(label1Text);
+
+
+		var inputEmail= document.createElement("input");
+		inputEmail.setAttribute("name", "email");
+		inputEmail.setAttribute("type", "text");
+		inputEmail.setAttribute("id", "emailid");
+
+		label1.appendChild(inputEmail);
+
+
+		var xpto= document.createElement("div");//for change line
+		var xptop=document.createElement("p");
+		xpto.appendChild(xptop);
+
+		createform.appendChild(label1);
+		createform.appendChild(xpto);
+
+
+		var label2=document.createElement("label");
+		var label2Text=document.createTextNode("Password");
+		label2.appendChild(label2Text);
+
+
+		var inputPassword= document.createElement("input");
+		inputPassword.setAttribute("name", "password");
+		inputPassword.setAttribute("type", "password");
+		inputPassword.setAttribute("id", "passwordid")
+		label2.appendChild(inputPassword);
+		createform.appendChild(label2);
+
+		var xpto1= document.createElement("div");//for change line
+		var xptop1=document.createElement("p");
+		xpto.appendChild(xptop1);
+		createform.appendChild(xpto1);
+
+
+		var but=document.createElement("button");
+		but.setAttribute("type", "button");
+
+		//but.setAttribute("name", "login");
+		but.setAttribute("onclick", "client.createNewUser()");
+		var butText=document.createTextNode("Creat New User");
+
+		but.appendChild(butText);
+
+		createform.appendChild(but);
+
+		x.appendChild(createform);
+
+/*
+		<label>Email</label><input name="email" type="text" required><br>
+		<label>Password</label><input name="password" type="password" required><br>
+		<button name="login"   onclick="client.createNewUser()">Creat New User</button>
+
+ 		<button type="button" onclick="alert('Hello world!')">Click Me!</button>
+
+*/
+
+
+	}
+	createNewUser(){
+
+	console.log("=======================================");
+		var textEmail = document.getElementById("emailid").value;
+		var textPassword = document.getElementById("passwordid").value;
+
+		console.log(textEmail);
+		console.log(textPassword);
+
+		var data = [textEmail, textPassword];
+		this.sendRequest("post", "/user/", data, this.flashMessage.bind(this, "User created", "success"));
+
+/*
+		if(DbAdapter.userValidate( textEmail, textPassword,callback)){
+			DbAdapter.userCreate(textEmail, textPassword,callback);
+		}
+*/
+
+		//alert(textEmail);
+
+
+
+	}
+
+	/*
+	email
+	password
+	* - button create user -> shows form: (email, pass, pass repeat, submit button)
+	 - button login -> show client.createLoginForm
+	 - INSPIRATION: client.createLoginForm
+	* */
 }
 
 

@@ -29,7 +29,7 @@ class workersManager{
     }
 
     sendToWorker(work){
-        var action = work.req.query.action;
+        var action = work.action;
         var scalar = work.scalar;
         var rows = work.rows;
         var self = this;
@@ -57,8 +57,8 @@ class workersManager{
 
     }
 
-        callworker(query, scalar, rows, res,req){
-            var work = {id: +new Date(), query: query, scalar: scalar, rows: rows, res: res, req: req};
+        callworker(action, scalar, rows, res,req){
+            var work = {id: +new Date(), action: action, scalar: scalar, rows: rows, res: res, req: req};
             // Store the work
             this.workersOther.push(work);
 

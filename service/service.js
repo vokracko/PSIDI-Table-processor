@@ -44,6 +44,7 @@ class Service extends Runnable {
 	start() {
 		this.app.get("/user/dataset/1", this.operation.bind(this));
 		this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
+		this.app.post("/user/", this.clientCreate.bind(this));
 		this.app.listen(this.port);
 	}
 
@@ -90,6 +91,13 @@ class Service extends Runnable {
 	datasetUpdate(req, res) {
 		console.log("service.datasetUpdate", req.body);
 		this.db.datasetUpdate(1, req.body, function(err, result) {
+			res.status(200).send();
+		});
+	}
+
+	clientCreate(req, res) {
+		console.log("service.clientCreate", req.body);
+		this.db.userCreate(req.body[0], req.body[1], function(err, result) {
 			res.status(200).send();
 		});
 	}
