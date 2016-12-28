@@ -7,6 +7,7 @@ class Client {
 		this.datasource = datasource;
 		this.btnUpload = null;
 		this.token = null;
+		this.dataset_id = 1;
 	}
 
 	createLoginForm() {
@@ -21,6 +22,12 @@ class Client {
 		email.render();
 		password.render();
 		submit.render();
+	}
+
+	logout() {
+		this.token = null;
+		this.dataset_id = null;
+		this.createLoginForm();
 	}
 
 	login(e) {
