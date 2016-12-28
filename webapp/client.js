@@ -223,8 +223,62 @@ class Client {
 		this.renderer.flashMessage(text, type);
 	}
 
+	macroList(){
+		this.sendRequest('get', '/user/macro', null, this.log.bind(this));
+	}
 
-	registrationForm(){
+	macroCreate(){
+		console.log('macro create');
+		//console.log(JSON.parse('"/user/dataset/1?action=count"'));
+		var name= prompt('macro name', 'dsf');
+		var ops= prompt('macro operations list ex:[\"/user/dataset/1?action=count\" ,\"/user/dataset/1?action=sum\"]', ['["/user/dataset/1?action=count","/user/dataset/1?action=sum"]']);
+		//var obj={'name':name, 'operations':'/user/dataset/1?action=count'};
+
+        var obj={'name':name, 'operations':JSON.parse(ops)};
+        console.log(obj.operations);
+		this.sendRequest(
+        	"post", //bc joel said so XD
+        	"/user/macro",
+   			obj,
+   			this.log.bind(this)
+
+			);
+
+	}
+
+	macroExecute(){
+		var dataset= prompt('what dataset do you want to operate on?');
+		var macroId= prompt('what macro Id do you want to execute?');
+		var obj={'dataset': dataset, 'macroId':macroId};
+		this.sendRequest(
+			"put",
+			"/user/macro",
+			obj,
+			this.treat.bind(this)
+	);		
+        }
+
+treat(result) {
+        result = JSON.parse(result);
+        var string = JSON.stringify(result);
+		console.log(string);
+        var json = JSON.parse(string);
+        console.log(json);
+        for (var i = 0; i < json.length; i++) {
+
+            var tmp=json[i].url;
+            var tmp1=tmp.split('=')[1];
+            console.log(tmp1);
+            this.operation(tmp1);
+
+        }
+    }
+
+	selectDataset(){
+		var dataset=prompt('what dataset do you want?');
+	}
+
+registrationForm(){
 
 		/*
 		var x = document.getElementById("formNewUser");
@@ -234,8 +288,6 @@ class Client {
 		var label1=document.createElement("label");
 		var label1Text=document.createTextNode("Email");
 		label1.appendChild(label1Text);
-
-
 		var inputEmail= document.createElement("input");
 		inputEmail.setAttribute("name", "email");
 		inputEmail.setAttribute("type", "text");
@@ -247,6 +299,7 @@ class Client {
 		var xpto= document.createElement("div");//for change line
 		var xptop=document.createElement("p");
 		xpto.appendChild(xptop);
+
 
 		createform.appendChild(label1);
 		createform.appendChild(xpto);

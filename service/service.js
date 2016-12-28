@@ -51,23 +51,23 @@ class Service extends Runnable {
 		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
 
 		this.app.get("/user/macro", this.macroList.bind(this));
-		this.app.post("user/macro", this.macroCreate.bind(this));
-
+		this.app.post("/user/macro", this.macroCreate.bind(this));
+		this.app.put("/user/macro", this.macroExecute.bind(this));
 		this.app.listen(this.port);
 	}
 
 	authorize(cb, req, res) {
 		var dataset_id = 1; // TODO
-		if (!req.query.token) {
+		if(!req.query.token) {
 			res.status(400) // TODO code
 			return;
 		}
 
 		var cb = cb.bind(this, req, res);
 
-		this.db.authorize(req.query.token, dataset_id, function (err, result) {
+		this.db.authorize(req.query.token, dataset_id, function(err, result) {
 			console.log("service.authorize result", result);
-			if (err || result.length == 0) {
+			if(err || result.length == 0) {
 				console.log("service.authorize error", err);
 				res.status(400); // TODO code
 				return;
@@ -218,10 +218,9 @@ class Service extends Runnable {
 			}
 		});
 	}
-
-	macroCreate(req, res) {
-		var name = req.body.name;
-		var ops = req.body.operations;
+	macroCreate(req,res){
+		var name=req.body.name;
+		var ops= req.body.operations;
 		console.log(req.body);
 		this.db.macroCreate(1, name, ops, function (err, result) {
 			res.status(200).send();
@@ -231,8 +230,63 @@ class Service extends Runnable {
 	macroList(req, res) {
 		this.db.macroList(1, function (err, result) {
 			res.json(result);
-		});
+        });
+    }
 
+    /*log(response) {
+        response = JSON.parse(response);
+        console.log("log", response);
+        this.renderer.flashMessage("Result is " + response, "success");
+    }*/
+
+    sendRequest(method, url, data, onReply) {
+        var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+        var request = new XMLHttpRequest();
+        var address = "localhost";//this.buildAddress(url);
+        console.log("service.sendRequest", method, address, data);
+        var request = new XMLHttpRequest();
+        request.open(method, address, true);
+        request.onreadystatechange = function() {
+            if(this.readyState == 4) { //done
+                console.log("client.sendRequest.done", this.responseText);
+                onReply(this.responseText);
+            }
+        }
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(JSON.stringify(data));
+    }
+  /*  buildAddress(url) {
+        var res = this.address + url;
+
+        if(url.indexOf('?') == -1) {
+            res += "?token=" + this.token;
+        } else {
+            res += "&token=" + this.token;
+        }
+
+        return res;
+    }
+*/
+    macroExecute(req,res){
+        var dataset= req.body.dataset;
+        var macroId= req.body.macroId;
+        this.db.macroOperations(macroId, function (err, result) {
+            /*var string=JSON.stringify(result);
+
+            var json =  JSON.parse(string);
+			var reply;
+        	for(var i=0; i< json.length; i++){
+
+                console.log(json[i].url);
+
+                this.sendRequest("get",/*"/user/dataset/" + dataset + "?action=" + */
+				/*				json[i].url, null,reply);// this.log.bind(this));
+            console.log(reply);
+        	}*/
+			res.json(result);
+        }.bind(this));
 	}
+
 }
+
 module.exports = Service;
