@@ -43,6 +43,7 @@ class Client {
 				}
 
 				client.token = JSON.parse(response).token;
+				console.log(client.token)
 				client.flashMessage("Login successful", "success");
 				client.datasetGet();
 			}
@@ -225,6 +226,7 @@ class Client {
 
 	registrationForm(){
 
+		/*
 		var x = document.getElementById("formNewUser");
 		var createform = document.createElement('form'); // Create New Element Form
 		createform.setAttribute("class", "formUser")
@@ -280,10 +282,72 @@ class Client {
 		createform.appendChild(but);
 
 		x.appendChild(createform);
+*/
 
+		this.renderer.overlay.setData({text: "", type: "success"});
+		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
+		var email = new Input("form", {type:"text"}, null);
+		var password = new Input("form", {type:"password"}, null);
+		var submit = new Input("form", {type:"submit", value: "Login jjjjjjjjj"}, this.creatUser.bind(this));
+
+		overlay.render();
+		form.render();
+		email.render();
+		password.render();
+		submit.render();
 
 
 	}
+
+
+	creatUser(e) {
+		e.preventDefault();
+
+		var form = document.forms[0];
+		var email = form.children[0].value;
+		var password = form.children[1].value;
+		var client = this;
+		//console.log(email);
+		//console.log(password);
+		this.sendRequestCreateUser(
+			"post",//"post",
+			"/user/" ,//+email+"?password="+password,
+			{email:email, password: password},
+			function(response) {
+				//console.log(response);
+				if(response=="200") {
+				client.flashMessage("user successful created", "success");
+				client.datasetGet();
+					alert("User Created");
+				}else{
+					alert("not credentials");
+					return;
+
+				}
+			}
+		);
+	}
+
+	sendRequestCreateUser(method, url, data, onReply) {
+		var address = this.buildAddressCreatUser(url);
+		console.log("client.sendRequest", method, address, data);
+		var request = new XMLHttpRequest();
+		request.open(method, address, true);
+		request.onreadystatechange = function() {
+			if(this.readyState == 4) { //done
+				console.log("client.sendRequest.done", this.responseText);
+				onReply("200");
+			}
+		}
+		request.setRequestHeader("Content-Type", "application/json");
+		request.send(JSON.stringify(data));
+	}
+
+	buildAddressCreatUser(url) {
+		var res = this.address + url;
+		return res;
+	}
+
 	createNewUser(){
 
 	console.log("=======================================");

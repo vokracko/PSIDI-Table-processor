@@ -156,7 +156,7 @@ class Service extends Runnable {
 
 	clientCreate(req, res) {
 		console.log("service.clientCreate", req.body);
-		this.db.userCreate(req.body[0], req.body[1], function (err, result) {
+		this.db.userCreate(req.body.email, req.body.password, function (err, result) {
 			res.status(200).send();
 		});
 	}
