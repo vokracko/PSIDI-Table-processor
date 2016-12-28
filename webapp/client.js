@@ -9,7 +9,7 @@ class Client {
 		this.token = null;
 	}
 
-	/*createLoginForm() {
+	createLoginForm() {
 		this.renderer.overlay.setData({text: "", type: "success"});
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
 		var email = new Input("form", {type:"text"}, null);
@@ -22,7 +22,7 @@ class Client {
 		password.render();
 		submit.render();
 	}
-*/
+
 	login(e) {
 		e.preventDefault();
 
