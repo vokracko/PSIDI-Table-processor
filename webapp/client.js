@@ -288,7 +288,7 @@ class Client {
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
 		var email = new Input("form", {type:"text"}, null);
 		var password = new Input("form", {type:"password"}, null);
-		var submit = new Input("form", {type:"submit", value: "Login jjjjjjjjj"}, this.creatUser.bind(this));
+		var submit = new Input("form", {type:"submit", value: "New user"}, this.creatUser.bind(this));
 
 		overlay.render();
 		form.render();
