@@ -46,6 +46,7 @@ class Service extends Runnable {
 
 		this.app.get("/user/macro", this.macroList.bind(this));
 		this.app.post("/user/macro", this.macroCreate.bind(this));
+		this.app.put("/user/macro", this.macroExecute.bind(this));
 		this.app.listen(this.port);
 	}
 
@@ -200,6 +201,29 @@ class Service extends Runnable {
 			res.json(result);
         });
     }
+
+    macroExecute(req,res){
+        var dataset= req.body.dataset;
+        var macroId= req.body.macroId;
+        this.db.macroOperations(macroId, function (err, result) {
+            var string=JSON.stringify(result);
+
+            var json =  JSON.parse(string);
+
+        	for(var i=0; i< json.length; i++){
+
+                console.log(json[i].url);
+				/*
+                this.sendRequest(
+                    "get",
+                    "/user/dataset/" + dataset + "?action=" + json[i].url+ ,
+                    null,
+                    this.log.bind(this)
+                );*/
+            }
+
+        });
+	}
 }
 
 module.exports = Service;

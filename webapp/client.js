@@ -244,6 +244,19 @@ class Client {
 
 	}
 
+	macroExecute(){
+		var dataset= prompt('what dataset do you want to operate on?');
+		var macroId= prompt('what macro Id do you want to execute?');
+
+		var obj={'dataset': dataset, 'macroId':macroId};
+		this.sendRequest(
+			"put",
+			"/user/macro",
+			obj,
+			this.log.bind(this)
+		);
+	}
+
 }
 
 

@@ -65,6 +65,7 @@
 			new Button("buttons-top", {text:"Save as JSON", class: "btn"}, client.export.bind(client, "json")),
 			new Button("buttons", {text:'get macros', class: 'btn-primary'}, client.macroList.bind(client)),
 			new Button("buttons", {text: 'create macros', class: 'btn-primary'}, client.macroCreate.bind(client)),
+			new Button("buttons", {text: 'execute macros', class: 'btn-primary'}, client.macroExecute.bind(client)),
 		];
 
 		renderer.addItems(items);
