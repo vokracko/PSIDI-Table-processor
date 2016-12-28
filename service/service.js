@@ -202,28 +202,60 @@ class Service extends Runnable {
         });
     }
 
+    /*log(response) {
+        response = JSON.parse(response);
+        console.log("log", response);
+        this.renderer.flashMessage("Result is " + response, "success");
+    }*/
+
+    sendRequest(method, url, data, onReply) {
+        var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+        var request = new XMLHttpRequest();
+        var address = "localhost";//this.buildAddress(url);
+        console.log("service.sendRequest", method, address, data);
+        var request = new XMLHttpRequest();
+        request.open(method, address, true);
+        request.onreadystatechange = function() {
+            if(this.readyState == 4) { //done
+                console.log("client.sendRequest.done", this.responseText);
+                onReply(this.responseText);
+            }
+        }
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(JSON.stringify(data));
+    }
+  /*  buildAddress(url) {
+        var res = this.address + url;
+
+        if(url.indexOf('?') == -1) {
+            res += "?token=" + this.token;
+        } else {
+            res += "&token=" + this.token;
+        }
+
+        return res;
+    }
+*/
     macroExecute(req,res){
         var dataset= req.body.dataset;
         var macroId= req.body.macroId;
         this.db.macroOperations(macroId, function (err, result) {
-            var string=JSON.stringify(result);
+            /*var string=JSON.stringify(result);
 
             var json =  JSON.parse(string);
-
+			var reply;
         	for(var i=0; i< json.length; i++){
 
                 console.log(json[i].url);
-				/*
-                this.sendRequest(
-                    "get",
-                    "/user/dataset/" + dataset + "?action=" + json[i].url+ ,
-                    null,
-                    this.log.bind(this)
-                );*/
-            }
 
-        });
+                this.sendRequest("get",/*"/user/dataset/" + dataset + "?action=" + */
+				/*				json[i].url, null,reply);// this.log.bind(this));
+            console.log(reply);
+        	}*/
+			res.json(result);
+        }.bind(this));
 	}
+
 }
 
 module.exports = Service;

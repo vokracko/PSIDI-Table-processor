@@ -253,8 +253,29 @@ class Client {
 			"put",
 			"/user/macro",
 			obj,
-			this.log.bind(this)
+			this.treat.bind(this)
 		);
+
+        }
+
+	treat(result) {
+        result = JSON.parse(result);
+        var string = JSON.stringify(result);
+		console.log(string);
+        var json = JSON.parse(string);
+        console.log(json);
+        for (var i = 0; i < json.length; i++) {
+
+            var tmp=json[i].url;
+            var tmp1=tmp.split('=')[1];
+            console.log(tmp1);
+            this.operation(tmp1);
+
+        }
+    }
+
+	selectDataset(){
+		var dataset=prompt('what dataset do you want?');
 	}
 
 }
