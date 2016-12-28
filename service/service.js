@@ -34,15 +34,20 @@ class Service extends Runnable {
 		  next();
 		});
 		this.app.use(bodyParser.json());
+		this.app.param('dataset_id', function(req, res, next, dataset_id){
+			console.log(dataset_id);
+			req.dataset_id = dataset_id;
+			return next();
+		})
 
 	}
 
 	start() {
 		this.app.post("/user/", this.userPost.bind(this)); // login
 
-		this.app.get("/user/dataset/1", this.authorize.bind(this, this.datasetGet)); 
-		this.app.post("/user/dataset/1", this.authorize.bind(this, this.datasetPost)); // update
-		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate that token is valid
+		this.app.get("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetGet)); // operation
+		this.app.post("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetPost)); // update
+		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate token
 
 		this.app.get("/user/macro", this.macroList.bind(this));
 		this.app.post("user/macro", this.macroCreate.bind(this));
@@ -50,7 +55,6 @@ class Service extends Runnable {
 	}
 
 	authorize(cb, req, res) {
-		var dataset_id = 1; // TODO
 		if(!req.query.token) {
 			res.status(400) // TODO code
 			return;
@@ -58,10 +62,8 @@ class Service extends Runnable {
 
 		var cb = cb.bind(this, req, res);
 
-		this.db.authorize(req.query.token, dataset_id, function(err, result) {
-			console.log("service.authorize result", result);
+		this.db.authorize(req.query.token, req.dataset_id, function(err, result) {
 			if(err || result.length == 0) {
-				console.log("service.authorize error", err);
 				res.status(400); // TODO code
 				return;
 			}
@@ -77,7 +79,6 @@ class Service extends Runnable {
 	}
 
     datasetGet(req, res) {
-    	var dataset_id = 1; // TODO dynamic from request
     	console.log("service.datasetGet enter");
 
 		if(req.query.action) { // something will be computed
@@ -94,12 +95,12 @@ class Service extends Runnable {
 			} else {
 				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
-			dbCall(dataset_id, function(err, rows) {
+			dbCall(req.dataset_id, function(err, rows) {
 				this.workerManager.taskSubmit(req.query.action, scalar, rows, res);
 				console.log("service.operation done");
 			}.bind(this));	
 		} else if(req.query.format) { // export
-			this.db.datasetGet(dataset_id, function(err, rows) {
+			this.db.datasetGet(req.dataset_id, function(err, rows) {
 				var converter;
 
 				switch(req.query.format) {
@@ -124,7 +125,7 @@ class Service extends Runnable {
 			}.bind(this));
 		} 
 		else { // just send dataset
-			this.db.datasetGet(dataset_id, function(err, rows) {
+			this.db.datasetGet(req.dataset_id, function(err, rows) {
 
 				res.json(rows); // json -> rows = array
 			});
@@ -166,7 +167,7 @@ class Service extends Runnable {
 		}
 
 		this.db.datasetCreate(1, "dataset name", data, function(err, result) {
-			res.json({errors: err, result: result});
+			res.json({errors: err, id: result});
 		})
 	}
 

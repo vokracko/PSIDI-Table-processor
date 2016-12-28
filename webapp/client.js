@@ -7,7 +7,7 @@ class Client {
 		this.datasource = datasource;
 		this.btnUpload = null;
 		this.token = null;
-		this.dataset_id = 1;
+		this.dataset_id = null;
 	}
 
 	createLoginForm() {
@@ -50,7 +50,7 @@ class Client {
 
 				client.token = JSON.parse(response).token;
 				client.flashMessage("Login successful", "success");
-				client.datasetGet();
+				// TODO list datasets
 			}
 		);
 	}
@@ -89,13 +89,12 @@ class Client {
 	}
 
 	operation(operation) { 
-		var dataset_id = 1; // TODO actual dataset number
 		var scope = "dataset"; // TODO row/col/ + index
 
 		// TOOD if scope => diferent uri
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + dataset_id + "?action=" + operation,
+			"/user/dataset/" + this.dataset_id + "?action=" + operation,
 			null,
 			this.log.bind(this)
 		);
@@ -128,8 +127,8 @@ class Client {
 							client.flashMessage("Bad format", "erorr");
 						} else {
 							client.flashMessage("Dataset saved");
-							// TODO Get ID
-							// TODO show that dataset
+							client.dataset_id  = json.id;
+							client.datasetGet();
 						}
 					}
 				);
@@ -140,10 +139,9 @@ class Client {
 	}
 
 	export(format) {
-		var dataset_id = 1; // TODO actual dataset number
 		this.sendRequest(
 			"get",
-			"/user/dataset/" + dataset_id + "?format=" + format,
+			"/user/dataset/" + this.dataset_id + "?format=" + format,
 			null,
 			this.save.bind(this)
 		);
@@ -184,23 +182,21 @@ class Client {
 
 	operationInput(operation) {
 		var scalar = prompt("Set value");
-		var dataset_id = 1; // TODO actual dataset number
 		var scope = "dataset"; // TODO row/col/ + index
 
 		// TOOD if scope => jina adresa
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + dataset_id + "?action=" + operation + "&scalar=" + scalar,
+			"/user/dataset/" + this.dataset_id + "?action=" + operation + "&scalar=" + scalar,
 			null,
 			this.renderTable.bind(this)
 		);
 	}
 
 	transpose() {
-		var dataset_id = 1; // TODO actual dataset number
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + dataset_id + "?action=transpose",
+			"/user/dataset/" + this.dataset_id + "?action=transpose",
 			null,
 			function(response) {
 				this.datasource.setData(JSON.parse(response));
@@ -210,12 +206,12 @@ class Client {
 	}
 
 	datasetGet() {
-		this.sendRequest("get", "/user/dataset/1", null, this.renderTable.bind(this));
+		this.sendRequest("get", "/user/dataset/" + this.dataset_id, null, this.renderTable.bind(this));
 	}
 
 	datasetUpdate() {
 		var data = this.datasource.toArray();
-		this.sendRequest("post", "/user/dataset/1", data, this.flashMessage.bind(this, "Dataset saved", "success"));
+		this.sendRequest("post", "/user/dataset/" + this.dataset_id, data, this.flashMessage.bind(this, "Dataset saved", "success"));
 	}
 
 	renderTable(response) {
