@@ -48,6 +48,8 @@ class Client {
 
 				client.token = JSON.parse(response).token;
 				client.flashMessage("Login successful", "success");
+				// client.dataset_id = 1;
+				// client.datasetGet();
 				// TODO list datasets
 			}
 		);
@@ -159,20 +161,26 @@ class Client {
 	}
 
 	operation(operation) { 
-		var scope = "dataset"; // TODO row/col/ + index
+		var selected = this.determineSelected();
+		var address = "/user/dataset/" + this.dataset_id;
+		var action = "?action=" + operation;
+		var address_scope = "";
+		
+		switch(selected.scope) {
+			case "all": break;
+			case "column": address_scope = "/col/" + selected.index; break;
+			case "row": address_scope = "/row/" + selected.index; break;
+		}
 
-		// TOOD if scope => diferent uri
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + this.dataset_id + "?action=" + operation,
+			address + address_scope + action,
 			null,
 			this.log.bind(this)
 		);
 	}
 
-
-
-	selected() {
+	determineSelected() {
 		var tableHeaders = document.getElementsByClassName("table-header selected");
 		
 		if(tableHeaders.length == 0) { //none
@@ -182,18 +190,16 @@ class Client {
 		var cell = tableHeaders[0];
 
 		if(cell.parentNode.rowIndex == 0) {
-			return {scope: "column", index: cell.cellIndex};
+			return {scope: "column", index: cell.cellIndex - 1};
 		}
 
-		return {scope: "row", index: cell.parentNode.rowIndex};
+		return {scope: "row", index: cell.parentNode.rowIndex - 1};
 
 	}
 
 	operationInput(operation) {
 		var scalar = prompt("Set value");
-		var scope = "dataset"; // TODO row/col/ + index
 
-		// TOOD if scope => jina adresa
 		this.sendRequest(
 			"get", 
 			"/user/dataset/" + this.dataset_id + "?action=" + operation + "&scalar=" + scalar,

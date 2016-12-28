@@ -35,8 +35,11 @@ class Service extends Runnable {
 		});
 		this.app.use(bodyParser.json());
 		this.app.param('dataset_id', function(req, res, next, dataset_id){
-			console.log(dataset_id);
 			req.dataset_id = dataset_id;
+			return next();
+		});
+		this.app.param('index', function(req, res, next, index){
+			req.index = index;
 			return next();
 		})
 
@@ -46,6 +49,8 @@ class Service extends Runnable {
 		this.app.post("/user/", this.userPost.bind(this)); // login
 
 		this.app.get("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetGet)); // operation
+		this.app.get("/user/dataset/:dataset_id/col/:index", this.authorize.bind(this, this.datasetGetCol)); // operation
+		this.app.get("/user/dataset/:dataset_id/row/:index", this.authorize.bind(this, this.datasetGetRow)); // operation
 		this.app.post("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetPost)); // update
 		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate token
 
@@ -76,6 +81,18 @@ class Service extends Runnable {
 		return operation == "transpose" ||
 			operation == "scale" ||
 			operation == "add";
+	}
+
+	datasetGetCol(req, res) {
+		this.db.datasetCol(req.dataset_id, req.index, function(err, rows) {
+			this.workerManager.taskSubmit(req.query.action, '', rows, res);
+		}.bind(this));
+	}
+
+	datasetGetRow(req, res) {
+		this.db.datasetRow(req.dataset_id, req.index, function(err, rows) {
+			this.workerManager.taskSubmit(req.query.action, '', rows, res);
+		}.bind(this));
 	}
 
     datasetGet(req, res) {
