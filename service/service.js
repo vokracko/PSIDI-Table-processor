@@ -41,6 +41,7 @@ class Service extends Runnable {
 
 		//this.app.get("/user/dataset/1", this.operation.bind(this));
 		//this.app.post("/user/dataset/1", this.datasetUpdate.bind(this));
+		this.app.put("/user/", this.userPost.bind(this));
 		this.app.post("/user/", this.clientCreate.bind(this));
 
 		//this.app.post("/user/", this.userPost.bind(this)); // login
@@ -197,7 +198,11 @@ class Service extends Runnable {
 	}
 
 	userPost(req, res) {
+		//console.log('here11');
+		//console.log(req.body.email);
+		//console.log(req.body.password);
 		if (!req.body.email || !req.body.password) {
+
 			res.status(400).send();
 			return;
 		}
@@ -205,9 +210,11 @@ class Service extends Runnable {
 		this.db.userValidate(req.body.email, req.body.password, function (err, result) {
 			if (err || !result) {
 				res.status(400).send(); // TODO code
+				//console.log('here');
 				return;
 			} else {
 				res.json({token: result});
+				//console.log('here1');
 			}
 		});
 	}

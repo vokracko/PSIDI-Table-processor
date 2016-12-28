@@ -30,10 +30,11 @@ class Client {
 		var email = form.children[0].value;
 		var password = form.children[1].value;
 		var client = this;
-
+		//console.log(email);
+		//console.log(password);
 		this.sendRequest(
-			"post",
-			"/user/",
+			"put",//"post",
+			"/user/" ,//+email+"?password="+password,
 			{email:email, password: password},
 			function(response) {
 				if(!response) {
