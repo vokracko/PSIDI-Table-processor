@@ -166,7 +166,7 @@ class Service extends Runnable {
 			return;
 		}
 
-		this.db.datasetCreate(1, "dataset name", data, function(err, result) {
+		this.db.datasetCreate(1, req.body.name, data, function(err, result) {
 			res.json({errors: err, id: result});
 		})
 	}

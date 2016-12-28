@@ -206,11 +206,11 @@ class Input extends Renderable {
 		super("input", location);
 		this.element.type = data.type;
 
-		if(data.type == "password") {
+		if(data.id == "password") {
 			this.element.value = "psidi";
 		}
 
-		if(data.type == "text") {
+		if(data.id == "email") {
 			this.element.value = "lukas@vokracko.cz";
 		}
 
@@ -221,6 +221,10 @@ class Input extends Renderable {
 		if(data.value) {
 			this.element.value = data.value;
 			this.element.placeholder = data.value;
+		}
+
+		if(data.id) {
+			this.element.id = data.id;
 		}
 
 		if(callback) {
