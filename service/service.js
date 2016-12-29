@@ -1,18 +1,7 @@
 "use strict";
 
 
-class Runnable {
-
-	start() {
-		throw Exception("not implemented");
-	}
-
-	stop() {
-		throw Exception("not implemented");
-	}
-}
-
-class Service extends Runnable {
+class Service {
 	constructor(config) {
 		super();
 		var WorkerManager = require("./workersManager.js");
@@ -41,7 +30,11 @@ class Service extends Runnable {
 		this.app.param('index', function(req, res, next, index){
 			req.index = index;
 			return next();
-		})
+		});
+		this.app.param('user_id', function(req, res, next, user_id){
+			req.user_id = user_id;
+			return next();
+		});
 
 	}
 
@@ -62,7 +55,7 @@ class Service extends Runnable {
 
 	authorize(cb, req, res) {
 		if(!req.query.token) {
-			res.status(400) // TODO code
+			res.status(401);
 			return;
 		}
 
@@ -70,12 +63,12 @@ class Service extends Runnable {
 
 		this.db.authorize(req.query.token, req.dataset_id, function(err, result) {
 			if(err || result.length == 0) {
-				res.status(400); // TODO code
+				res.status(401); 
 				return;
 			}
 
 			cb();
-		})
+		});
 	}
 
 	isComplex(operation) {
@@ -85,12 +78,20 @@ class Service extends Runnable {
 	}
 
 	datasetGetCol(req, res) {
+		if(!req.query.action) {
+			res.status(400).send();
+		}
+
 		this.db.datasetCol(req.dataset_id, req.index, function(err, rows) {
 			this.workerManager.taskSubmit(req.query.action, '', rows, res);
 		}.bind(this));
 	}
 
 	datasetGetRow(req, res) {
+		if(!req.query.action) {
+			res.status(400).send();
+		}
+
 		this.db.datasetRow(req.dataset_id, req.index, function(err, rows) {
 			this.workerManager.taskSubmit(req.query.action, '', rows, res);
 		}.bind(this));
@@ -152,23 +153,21 @@ class Service extends Runnable {
 		console.log("service.datasetGet exit");
 	}
 
-	datasetPost(req, res) {
-		console.log("service.post", req.body);
-		this.db.datasetUpdate(1, req.body, function(err, result) {
-			res.status(200).send();
-		});
-	}
-
-
-	clientCreate(req, res) {
+clientCreate(req, res) {
 		console.log("service.clientCreate", req.body);
 		this.db.userCreate(req.body.email, req.body.password, function (err, result) {
 			res.status(200).send();
 		});
 	}
 
+
 	datasetPut(req, res) {
-		console.log("service.datasetPut", req.body);
+		this.db.datasetUpdate(req.dataset_id, req.body, function(err, result) {
+			res.status(200).send();
+		});
+	}
+
+	datasetPost(req, res) {
 		var arr = req.body.filename.split('.');
 		var ext = arr[arr.length - 1];
 		var converter;
@@ -187,11 +186,12 @@ class Service extends Runnable {
 
 		data = converter.toJSON(req.body.data);
 
-		if (!data) {
+		if(!data) {
 			res.status(400).send(); // TODO correct code
 			return;
 		}
 
+		// TODO user ID!!
 		this.db.datasetCreate(1, req.body.name, data, function(err, result) {
 			res.json({errors: err, id: result});
 		})
@@ -207,10 +207,9 @@ class Service extends Runnable {
 			return;
 		}
 
-		this.db.userValidate(req.body.email, req.body.password, function (err, result) {
-			if (err || !result) {
+		this.db.userValidate(req.body.email, req.body.password, function(err, result) {
+			if(err || !result) {
 				res.status(400).send(); // TODO code
-				//console.log('here');
 				return;
 			} else {
 				res.json({token: result});
@@ -222,13 +221,15 @@ class Service extends Runnable {
 		var name=req.body.name;
 		var ops= req.body.operations;
 		console.log(req.body);
-		this.db.macroCreate(1, name, ops, function (err, result) {
+		// TODO user id
+		this.db.macroCreate(1,name,ops,function (err,result) {
 			res.status(200).send();
 		});
 	}
 
-	macroList(req, res) {
-		this.db.macroList(1, function (err, result) {
+	macroList(req,res){
+		// TODO user id
+		this.db.macroList(1, function(err,result){
 			res.json(result);
         });
     }

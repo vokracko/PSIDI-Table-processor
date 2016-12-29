@@ -2,10 +2,9 @@
 
 class DbAdapter {
 	constructor(config) {
-		this.result;
-		this.mysql = require("mysql");
+		var mysql = require("mysql");
 		this.util = require("util");
-		this.connection = this.mysql.createConnection(config);
+		this.connection = mysql.createConnection(config);
 
 		this.connection.connect(function(err) {
 			if(err) {
