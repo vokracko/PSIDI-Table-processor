@@ -250,7 +250,7 @@ class Client {
 		console.log('macro create');
 		//console.log(JSON.parse('"/user/dataset/1?action=count"'));
 		var name= prompt('macro name', 'dsf');
-		var ops= prompt('macro operations list ex:[\"/user/dataset/1?action=count\" ,\"/user/dataset/1?action=sum\"]', ['["/user/dataset/1?action=count","/user/dataset/1?action=sum"]']);
+		var ops= prompt('macro operations list ex:[\"count\" ,\"sum\"]', ['["count","sum"]']);
 		//var obj={'name':name, 'operations':'/user/dataset/1?action=count'};
 
         var obj={'name':name, 'operations':JSON.parse(ops)};
@@ -286,9 +286,9 @@ treat(result) {
         for (var i = 0; i < json.length; i++) {
 
             var tmp=json[i].url;
-            var tmp1=tmp.split('=')[1];
-            console.log(tmp1);
-            this.operation(tmp1);
+            //var tmp1=tmp.split('=')[1];
+            console.log(tmp);
+            this.operation(tmp);
 
         }
     }
