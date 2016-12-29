@@ -2,7 +2,6 @@
 
 class Service {
 	constructor(config) {
-		//super();
 		var WorkerManager = require("./workersManager.js");
 		var express = require('express');
 		var DbAdapter = require("./dbadapter.js");
