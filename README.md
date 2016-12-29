@@ -1,5 +1,8 @@
 # Dependencies
 `lighttpd`
+`node > 7.2`
+
+browser with ECMAScript 6 and above
 
 # Installation
 ## Project
@@ -23,4 +26,4 @@ with your username
 # Configuration
 `{projectLocation}/{service,worker}/config.json`
 
-[Database administration](http://adminer.vokracko.cz/?server=31.31.77.215&username=psidi&db=psidi&select=cell) (pw: psidi)
+[Database administration](http://adminer.vokracko.cz/?server=31.31.77.215&username=psidi&db=psidi&select=cell) (password: psidi)
