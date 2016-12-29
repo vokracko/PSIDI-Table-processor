@@ -61,29 +61,27 @@
 			new Button("buttons", {text:"add", class: "btn-primary"}, client.operationInput.bind(client, "add")),
 			// modifies dataset
 			new Button("buttons", {text:"update", class: "btn-danger"}, client.datasetUpdate.bind(client)),
-			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
-			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
-			// new Button("buttons", {text:"median"}, client.operation.bind(client, "median")),
+			//macros
+			new Button("buttons", {text:'get macros', class: 'btn-primary'}, client.macroList.bind(client)),
+			new Button("buttons", {text: 'create macros', class: 'btn-primary'}, client.macroCreate.bind(client)),
+			new Button("buttons", {text: 'execute macros', class: 'btn-primary'}, client.macroExecute.bind(client)),
 
-			new Button("buttons", {text:"create user", class: "btn-primary"}, client.registrationForm.bind(client)),
-
-			//new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
+			// import/export
+			new Button("buttons-top", {text: 'Select dataset', class: 'btn-primary'}, client.datasetSelect.bind(client)),
 			new Button("buttons-top", {text:"Import", class: "btn"}, client.createImportForm.bind(client)),
 			new Button("buttons-top", {text:"Save as CSV", class: "btn"}, client.export.bind(client, "csv")),
 			new Button("buttons-top", {text:"Save as XML", class: "btn"}, client.export.bind(client, "xml")),
 			new Button("buttons-top", {text:"Save as JSON", class: "btn"}, client.export.bind(client, "json")),
 			new Button("buttons-top", {text:"Logout", class: "btn"}, client.logout.bind(client)),
-			new Button("buttons", {text:'get macros', class: 'btn-primary'}, client.macroList.bind(client)),
-			new Button("buttons", {text: 'create macros', class: 'btn-primary'}, client.macroCreate.bind(client)),
-			new Button("buttons", {text: 'execute macros', class: 'btn-primary'}, client.macroExecute.bind(client)),
-			new Button("buttons", {text: 'select dataset', class: 'btn-primary'}, client.selectDataset.bind(client)),
+
+
 		];
 
 		renderer.addItems(items);
 		renderer.setOverlay(overlay);
 		renderer.renderItems();
 
-		client.createLoginForm();
+		client.createDefaultOverlay();
 
 	</script>
 </body>

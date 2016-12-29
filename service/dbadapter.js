@@ -87,6 +87,12 @@ class DbAdapter {
 		});
 	}
 
+	datasetList(token, callback) {
+		this.connection.query('SELECT dataset.id, dataset.name FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE user.password = ?', [token], function(err, rows, fields) {
+			callback(err, rows);
+		});
+	}
+
 	authorize(token, id, callback) {
 		this.connection.query('SELECT * FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE dataset.id = ? AND user.password = ?', [id, token], function(err, rows, fileds) {
 			callback(err, rows);

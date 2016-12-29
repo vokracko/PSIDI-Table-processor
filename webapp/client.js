@@ -6,10 +6,63 @@ class Client {
 		this.renderer = renderer;
 		this.datasource = datasource;
 		this.token = null;
-		this.dataset_id = null;
+		this.dataset_id = 1;
 	}
 
-	createLoginForm() {
+	createRegisterForm(e) {
+		e.preventDefault();
+		this.renderer.overlay.setData({text: "", type: "success"});
+		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
+		var email = new Input("form", {type:"text"}, null);
+		var password = new Input("form", {type:"password"}, null);
+		var submit = new Input("form", {type:"submit", value: "New user"}, this.registerUser.bind(this));
+
+		overlay.render();
+		form.render();
+		email.render();
+		password.render();
+		submit.render();
+	}
+
+
+	registerUser(e) {
+		e.preventDefault();
+
+		var form = document.forms[0];
+		var email = form.children[0].value;
+		var password = form.children[1].value;
+		var client = this;
+
+		this.sendRequest(
+			"post",
+			"/user",
+			{email:email, password: password},
+			function(token) {
+				if(token) {
+					client.token = token;
+					client.flashMessage("User successful created", "success");
+					client.datasetSelect();
+				} else {
+					client.flashMessage("Failed", "fail");
+				}
+			}
+		);
+	}
+
+	createDefaultOverlay() {
+		this.renderer.overlay.setData({text: "", type: "success"});
+		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
+		var login = new Input("form", {type:"submit", value:"Login"}, this.createLoginForm.bind(this));
+		var register = new Input("form", {type:"submit", value: "Register"}, this.createRegisterForm.bind(this));
+
+		overlay.render();
+		form.render();
+		login.render();
+		register.render();
+	}
+
+	createLoginForm(e) {
+		e.preventDefault();
 		this.renderer.overlay.setData({text: "", type: "success"});
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
 		var email = new Input("form", {type:"text", id: "email"}, null);
@@ -49,11 +102,8 @@ class Client {
 				}
 
 				client.token = JSON.parse(response).token;
-				console.log(client.token);
 				client.flashMessage("Login successful", "success");
-				 client.dataset_id = 1;
-				 client.datasetGet();
-				// TODO list datasets
+				client.datasetSelect();
 			}
 		);
 	}
@@ -223,7 +273,11 @@ class Client {
 		);
 	}
 
-	datasetGet() {
+	datasetGet(id) {
+		if(id) {
+			this.dataset_id = id;
+		}
+		
 		this.sendRequest("get", "/user/dataset/" + this.dataset_id, null, this.renderTable.bind(this));
 	}
 
@@ -277,7 +331,7 @@ class Client {
 	);		
         }
 
-treat(result) {
+	treat(result) {
         result = JSON.parse(result);
         var string = JSON.stringify(result);
 		console.log(string);
@@ -293,153 +347,30 @@ treat(result) {
         }
     }
 
-	selectDataset(){
-		var dataset=prompt('what dataset do you want?');
-	}
-
-registrationForm(){
-
-		/*
-		var x = document.getElementById("formNewUser");
-		var createform = document.createElement('form'); // Create New Element Form
-		createform.setAttribute("class", "formUser")
-
-		var label1=document.createElement("label");
-		var label1Text=document.createTextNode("Email");
-		label1.appendChild(label1Text);
-		var inputEmail= document.createElement("input");
-		inputEmail.setAttribute("name", "email");
-		inputEmail.setAttribute("type", "text");
-		inputEmail.setAttribute("id", "emailid");
-
-		label1.appendChild(inputEmail);
-
-
-		var xpto= document.createElement("div");//for change line
-		var xptop=document.createElement("p");
-		xpto.appendChild(xptop);
-
-
-		createform.appendChild(label1);
-		createform.appendChild(xpto);
-
-
-		var label2=document.createElement("label");
-		var label2Text=document.createTextNode("Password");
-		label2.appendChild(label2Text);
-
-
-		var inputPassword= document.createElement("input");
-		inputPassword.setAttribute("name", "password");
-		inputPassword.setAttribute("type", "password");
-		inputPassword.setAttribute("id", "passwordid")
-		label2.appendChild(inputPassword);
-		createform.appendChild(label2);
-
-		var xpto1= document.createElement("div");//for change line
-		var xptop1=document.createElement("p");
-		xpto.appendChild(xptop1);
-		createform.appendChild(xpto1);
-
-
-		var but=document.createElement("button");
-		but.setAttribute("type", "button");
-
-		//but.setAttribute("name", "login");
-		but.setAttribute("onclick", "client.createNewUser()");
-		var butText=document.createTextNode("Creat New User");
-
-		but.appendChild(butText);
-
-		createform.appendChild(but);
-
-		x.appendChild(createform);
-*/
-
-		this.renderer.overlay.setData({text: "", type: "success"});
-		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
-		var email = new Input("form", {type:"text"}, null);
-		var password = new Input("form", {type:"password"}, null);
-		var submit = new Input("form", {type:"submit", value: "New user"}, this.creatUser.bind(this));
-
-		overlay.render();
-		form.render();
-		email.render();
-		password.render();
-		submit.render();
-
-
-	}
-
-
-	creatUser(e) {
-		e.preventDefault();
-
-		var form = document.forms[0];
-		var email = form.children[0].value;
-		var password = form.children[1].value;
-		var client = this;
-		//console.log(email);
-		//console.log(password);
-		this.sendRequestCreateUser(
-			"post",//"post",
-			"/user/" ,//+email+"?password="+password,
-			{email:email, password: password},
-			function(response) {
-				//console.log(response);
-				if(response=="200") {
-				client.flashMessage("user successful created", "success");
-				client.datasetGet();
-					alert("User Created");
-				}else{
-					alert("not credentials");
-					return;
-
-				}
-			}
+	datasetSelect(){
+		this.sendRequest(
+			"get",
+			"/user/dataset/",
+			null,
+			this.datasetList.bind(this)
 		);
 	}
 
-	sendRequestCreateUser(method, url, data, onReply) {
-		var address = this.buildAddressCreatUser(url);
-		console.log("client.sendRequest", method, address, data);
-		var request = new XMLHttpRequest();
-		request.open(method, address, true);
-		request.onreadystatechange = function() {
-			if(this.readyState == 4) { //done
-				console.log("client.sendRequest.done", this.responseText);
-				onReply("200");
-			}
+	datasetList(data) {
+		if(!data || JSON.parse(data).length == 0) {
+			this.renderer.flashMessage("No dataset yet, import one", "notice");
+			return;
 		}
-		request.setRequestHeader("Content-Type", "application/json");
-		request.send(JSON.stringify(data));
+
+		this.renderer.overlay.setData({text: "", type: "success"});
+		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
+		var select = new Select("form", {type:"text", options:JSON.parse(data)}, function(id) {
+			this.renderer.overlay.hide();
+			this.datasetGet(id);
+		}.bind(this));
+
+		overlay.render();
+		form.render();
+		select.render();
 	}
-
-	buildAddressCreatUser(url) {
-		var res = this.address + url;
-		return res;
-	}
-
-	createNewUser(){
-
-	console.log("=======================================");
-		var textEmail = document.getElementById("emailid").value;
-		var textPassword = document.getElementById("passwordid").value;
-
-		console.log(textEmail);
-		console.log(textPassword);
-
-		var data = [textEmail, textPassword];
-		this.sendRequest("post", "/user/", data, this.flashMessage.bind(this, "User created", "success"));
-		var x = document.getElementById("formNewUser");
-		x.innerHTML=" "
-
-
-
-
-
-	}
-
 }
-
-

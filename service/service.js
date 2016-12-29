@@ -37,9 +37,10 @@ class Service {
 	}
 
 	start() {
-		this.app.put("/user/", this.userPost.bind(this)); // login
-        this.app.post("/user/", this.clientCreate.bind(this));
+		this.app.put("/user/", this.userPut.bind(this)); // login
+        this.app.post("/user/", this.userPost.bind(this));
 
+        this.app.get("/user/dataset", this.datasetGetList.bind(this));
 		this.app.get("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetGet)); // operation
 		this.app.get("/user/dataset/:dataset_id/col/:index", this.authorize.bind(this, this.datasetGetCol)); // operation
 		this.app.get("/user/dataset/:dataset_id/row/:index", this.authorize.bind(this, this.datasetGetRow)); // operation
@@ -50,6 +51,12 @@ class Service {
 		this.app.post("/user/macro", this.macroCreate.bind(this));
 		this.app.put("/user/macro", this.macroExecute.bind(this));
 		this.app.listen(this.port);
+	}
+
+	datasetGetList(req, res) {
+		this.db.datasetList(req.query.token, function(err, rows) {
+			res.json(rows);
+		});
 	}
 
 	authorize(cb, req, res) {
@@ -152,7 +159,7 @@ class Service {
 		console.log("service.datasetGet exit");
 	}
 
-clientCreate(req, res) {
+	userPost(req, res) {
 		console.log("service.clientCreate", req.body);
 		this.db.userCreate(req.body.email, req.body.password, function (err, result) {
 			res.status(200).send();
@@ -160,13 +167,13 @@ clientCreate(req, res) {
 	}
 
 
-	datasetPut(req, res) {
+	datasetPost(req, res) {
 		this.db.datasetUpdate(req.dataset_id, req.body, function(err, result) {
 			res.status(200).send();
 		});
 	}
 
-	datasetPost(req, res) {
+	datasetPut(req, res) {
 		var arr = req.body.filename.split('.');
 		var ext = arr[arr.length - 1];
 		var converter;
@@ -196,7 +203,7 @@ clientCreate(req, res) {
 		})
 	}
 
-	userPost(req, res) {
+	userPut(req, res) {
 
 		if (!req.body.email || !req.body.password) {
 
@@ -214,6 +221,7 @@ clientCreate(req, res) {
 			}
 		});
 	}
+
 	macroCreate(req,res){
 		var name=req.body.name;
 		var ops= req.body.operations;
@@ -236,7 +244,6 @@ clientCreate(req, res) {
         var dataset= req.body.dataset;
         var macroId= req.body.macroId;
         this.db.macroOperations(macroId, function (err, result) {
-
 			res.json(result);
         }.bind(this));
 	}

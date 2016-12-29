@@ -240,3 +240,32 @@ class Form extends Renderable {
 		this.element.onclick = callback;
 	}
 }
+
+class Select extends Renderable {
+	constructor(location, data, callback) {
+		super("select", location);
+
+		this.element.onchange = function(e) {
+			var dataset_id = this.options[this.selectedIndex].value;
+
+			if(dataset_id == null) {
+				return;
+			}
+			
+			callback(dataset_id);
+		}
+
+		var option = document.createElement("option");
+		option.text = "Choose dataset";
+		option.value = null;
+		this.element.add(option);
+
+
+		for(var i = 0; i < data.options.length; ++i) {
+			var option = document.createElement("option");
+			option.text = data.options[i].name;
+			option.value = data.options[i].id;
+			this.element.add(option);
+		}
+	}
+}

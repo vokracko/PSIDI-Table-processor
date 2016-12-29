@@ -54,11 +54,11 @@ td.selected.table-header {
 #buttons {
 	padding: 10px 0 10px 5px;
 	float:left;
-	width: 120px;
+	width: 140px;
 }
 
 #buttons button {
-	width: 100px;
+	width: 120px;
 	margin: 2px;
 	float:right;
 }
