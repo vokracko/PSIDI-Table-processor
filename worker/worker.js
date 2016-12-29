@@ -23,7 +23,7 @@ class Worker {
 	//	this.sleep();
 
 		if(!req.body) {
-			res.send("Invalid data");
+			res.status(400).send("Invalid data");
 			return;
 		}
 
