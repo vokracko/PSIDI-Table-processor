@@ -40,7 +40,7 @@ class DbAdapter {
 			} else {
 				var dataset_id = result.insertId;
 				this.connection.query(this.cellInsertPrepare(dataset_id, data), function(err, result) {
-					callback(err, result);
+					callback(err, dataset_id);
 				}.bind(this));
 			}
 

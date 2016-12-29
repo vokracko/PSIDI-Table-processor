@@ -24,13 +24,6 @@
 			</div>
 		</div>
 		<div id="form">
-			<!--
-			<form">
-				<label for="username">Username</label><input name="username" type="text"><br>
-				<label for="password">Password</label><input name="password" type="password"><br>
-				<input name="login" value="Login" type="submit">
-			</form>
-			 -->	
 		</div>
 
 	</div>
@@ -75,9 +68,11 @@
 			new Button("buttons", {text:"create user", class: "btn-primary"}, client.registrationForm.bind(client)),
 
 			new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
+			new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
 			new Button("buttons-top", {text:"Save as CSV", class: "btn"}, client.export.bind(client, "csv")),
 			new Button("buttons-top", {text:"Save as XML", class: "btn"}, client.export.bind(client, "xml")),
 			new Button("buttons-top", {text:"Save as JSON", class: "btn"}, client.export.bind(client, "json")),
+			new Button("buttons-top", {text:"Logout", class: "btn"}, client.logout.bind(client)),
 			new Button("buttons", {text:'get macros', class: 'btn-primary'}, client.macroList.bind(client)),
 			new Button("buttons", {text: 'create macros', class: 'btn-primary'}, client.macroCreate.bind(client)),
 			new Button("buttons", {text: 'execute macros', class: 'btn-primary'}, client.macroExecute.bind(client)),

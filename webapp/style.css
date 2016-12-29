@@ -75,3 +75,12 @@ td.selected.table-header {
 	width: 120px;
 	margin-right: 5px;
 }
+
+#form-import {
+	text-align: left:;
+	width: 400px;
+}
+
+#form-import input, #form-import button {
+	float:left;
+}

@@ -5,15 +5,15 @@ class Client {
 		this.address = "http://" + ip + ":" + port;
 		this.renderer = renderer;
 		this.datasource = datasource;
-		this.btnUpload = null;
 		this.token = null;
+		this.dataset_id = null;
 	}
 
 	createLoginForm() {
 		this.renderer.overlay.setData({text: "", type: "success"});
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
-		var email = new Input("form", {type:"text"}, null);
-		var password = new Input("form", {type:"password"}, null);
+		var email = new Input("form", {type:"text", id: "email"}, null);
+		var password = new Input("form", {type:"password", id:"password"}, null);
 		var submit = new Input("form", {type:"submit", value: "Login"}, this.login.bind(this));
 
 		overlay.render();
@@ -23,12 +23,17 @@ class Client {
 		submit.render();
 	}
 
+	logout() {
+		this.token = null;
+		this.dataset_id = null;
+		this.createLoginForm();
+	}
+
 	login(e) {
 		e.preventDefault();
 
-		var form = document.forms[0];
-		var email = form.children[0].value;
-		var password = form.children[1].value;
+		var email = document.getElementById("email").value;
+		var password = document.getElementById("password").value;
 		var client = this;
 		//console.log(email);
 		//console.log(password);
@@ -45,9 +50,83 @@ class Client {
 				client.token = JSON.parse(response).token;
 				console.log(client.token)
 				client.flashMessage("Login successful", "success");
-				client.datasetGet();
+				// client.dataset_id = 1;
+				// client.datasetGet();
+				// TODO list datasets
 			}
 		);
+	}
+
+	createImportForm() {
+		var form = new Form("overlay", {id: "form-import"}, function(e) {e.stopPropagation();});
+		var btnUpload = new Input("form-import", {type:"file", id:"file"}, null);
+		var datasetName = new Input("form-import", {type:"text", id:"dataset_name"}, null);
+		var submit = new Input("form-import", {type:"submit", value: "Import"}, this.import.bind(this));
+		
+		this.renderer.overlay.setData({text: "", type: "success"});
+		this.renderer.overlay.render();
+		form.render();
+		datasetName.render();
+		btnUpload.render();
+		submit.render();
+	}
+
+	import(e) {
+		e.preventDefault();
+		var file = document.getElementById("file").files.item(0);
+		var name = document.getElementById("dataset_name").value;
+		var cb = this.log.bind(this);
+		var reader = new FileReader();
+		var client = this;
+		reader.onload = function(){
+			console.log("reading");
+			if(reader.readyState == 2) {// DONE
+				console.log(reader.result);
+				client.sendRequest(
+					"put",
+					"/user/dataset/",
+					{data:reader.result, filename: file.name, name: name},
+					function(result) {
+						var json = JSON.parse(result);
+						// TODO result.status code has error info too
+						if(json.errors) {
+							client.flashMessage("Bad format", "erorr");
+						} else {
+							client.flashMessage("Dataset saved");
+							client.dataset_id  = json.id;
+							client.datasetGet();
+						}
+					}
+				);
+			}
+		};
+
+		reader.readAsText(file);
+	}
+
+	export(format) {
+		this.sendRequest(
+			"get",
+			"/user/dataset/" + this.dataset_id + "?format=" + format,
+			null,
+			this.save.bind(this)
+		);
+	}
+
+	save(result) {
+		result = JSON.parse(result);
+		var mimeType;
+		var ext;
+		var filename = "dataset";
+
+		switch(result.format) {
+			case 'xml': mimeType = 'text/xml'; ext = 'xml'; break;
+			case 'json': mimeType = 'application/json'; ext = 'json'; break;
+			case 'csv': mimeType = 'text/csv'; ext = 'csv'; break;
+		}
+
+		var blob = new Blob([result.data], {type: mimeType + ";charset=utf-8"});
+		saveAs(blob, filename + '.' + ext);
 	}
 
 	buildAddress(url) {
@@ -84,83 +163,26 @@ class Client {
 	}
 
 	operation(operation) { 
-		var dataset_id = 1; // TODO actual dataset number
-		var scope = "dataset"; // TODO row/col/ + index
+		var selected = this.determineSelected();
+		var address = "/user/dataset/" + this.dataset_id;
+		var action = "?action=" + operation;
+		var address_scope = "";
+		
+		switch(selected.scope) {
+			case "all": break;
+			case "column": address_scope = "/col/" + selected.index; break;
+			case "row": address_scope = "/row/" + selected.index; break;
+		}
 
-		// TOOD if scope => diferent uri
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + dataset_id + "?action=" + operation,
+			address + address_scope + action,
 			null,
 			this.log.bind(this)
 		);
 	}
 
-	import() {
-		this.btnUpload = new Input("overlay", {type:"file", onchange: this.upload.bind(this)}, null);
-		this.renderer.overlay.setData({text: "", type: "success"});
-		this.renderer.overlay.render();
-		this.btnUpload.render();
-	}
-
-	upload() {
-		var file = this.btnUpload.element.files.item(0);
-		var cb = this.log.bind(this);
-		var reader = new FileReader();
-		var client = this;
-		reader.onload = function(){
-			console.log("reading");
-			if(reader.readyState == 2) {// DONE
-				console.log(reader.result);
-				client.sendRequest(
-					"put",
-					"/user/dataset/",
-					{data:reader.result, filename: file.name},
-					function(result) {
-						var json = JSON.parse(result);
-						// TODO result.status code has error info too
-						if(json.errors) {
-							client.flashMessage("Bad format", "erorr");
-						} else {
-							client.flashMessage("Dataset saved");
-							// TODO Get ID
-							// TODO show that dataset
-						}
-					}
-				);
-			}
-		};
-
-		reader.readAsText(file);
-	}
-
-	export(format) {
-		var dataset_id = 1; // TODO actual dataset number
-		this.sendRequest(
-			"get",
-			"/user/dataset/" + dataset_id + "?format=" + format,
-			null,
-			this.save.bind(this)
-		);
-	}
-
-	save(result) {
-		result = JSON.parse(result);
-		var mimeType;
-		var ext;
-		var filename = "dataset";
-
-		switch(result.format) {
-			case 'xml': mimeType = 'text/xml'; ext = 'xml'; break;
-			case 'json': mimeType = 'application/json'; ext = 'json'; break;
-			case 'csv': mimeType = 'text/csv'; ext = 'csv'; break;
-		}
-
-		var blob = new Blob([result.data], {type: mimeType + ";charset=utf-8"});
-		saveAs(blob, filename + '.' + ext);
-	}
-
-	selected() {
+	determineSelected() {
 		var tableHeaders = document.getElementsByClassName("table-header selected");
 		
 		if(tableHeaders.length == 0) { //none
@@ -170,32 +192,28 @@ class Client {
 		var cell = tableHeaders[0];
 
 		if(cell.parentNode.rowIndex == 0) {
-			return {scope: "column", index: cell.cellIndex};
+			return {scope: "column", index: cell.cellIndex - 1};
 		}
 
-		return {scope: "row", index: cell.parentNode.rowIndex};
+		return {scope: "row", index: cell.parentNode.rowIndex - 1};
 
 	}
 
 	operationInput(operation) {
 		var scalar = prompt("Set value");
-		var dataset_id = 1; // TODO actual dataset number
-		var scope = "dataset"; // TODO row/col/ + index
 
-		// TOOD if scope => jina adresa
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + dataset_id + "?action=" + operation + "&scalar=" + scalar,
+			"/user/dataset/" + this.dataset_id + "?action=" + operation + "&scalar=" + scalar,
 			null,
 			this.renderTable.bind(this)
 		);
 	}
 
 	transpose() {
-		var dataset_id = 1; // TODO actual dataset number
 		this.sendRequest(
 			"get", 
-			"/user/dataset/" + dataset_id + "?action=transpose",
+			"/user/dataset/" + this.dataset_id + "?action=transpose",
 			null,
 			function(response) {
 				this.datasource.setData(JSON.parse(response));
@@ -205,12 +223,12 @@ class Client {
 	}
 
 	datasetGet() {
-		this.sendRequest("get", "/user/dataset/1", null, this.renderTable.bind(this));
+		this.sendRequest("get", "/user/dataset/" + this.dataset_id, null, this.renderTable.bind(this));
 	}
 
 	datasetUpdate() {
 		var data = this.datasource.toArray();
-		this.sendRequest("post", "/user/dataset/1", data, this.flashMessage.bind(this, "Dataset saved", "success"));
+		this.sendRequest("post", "/user/dataset/" + this.dataset_id, data, this.flashMessage.bind(this, "Dataset saved", "success"));
 	}
 
 	renderTable(response) {
