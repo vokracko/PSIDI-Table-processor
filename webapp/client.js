@@ -31,6 +31,7 @@ class Client {
 
 	login(e) {
 		e.preventDefault();
+        var form = document.forms[0];
 
 		var email = document.getElementById("email").value;
 		var password = document.getElementById("password").value;
@@ -48,10 +49,10 @@ class Client {
 				}
 
 				client.token = JSON.parse(response).token;
-				console.log(client.token)
+				console.log(client.token);
 				client.flashMessage("Login successful", "success");
-				// client.dataset_id = 1;
-				// client.datasetGet();
+				 client.dataset_id = 1;
+				 client.datasetGet();
 				// TODO list datasets
 			}
 		);

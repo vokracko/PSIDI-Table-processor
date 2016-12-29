@@ -67,8 +67,8 @@
 
 			new Button("buttons", {text:"create user", class: "btn-primary"}, client.registrationForm.bind(client)),
 
-			new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
-			new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
+			//new Button("buttons-top", {text:"Import", class: "btn"}, client.import.bind(client)),
+			new Button("buttons-top", {text:"Import", class: "btn"}, client.createImportForm.bind(client)),
 			new Button("buttons-top", {text:"Save as CSV", class: "btn"}, client.export.bind(client, "csv")),
 			new Button("buttons-top", {text:"Save as XML", class: "btn"}, client.export.bind(client, "xml")),
 			new Button("buttons-top", {text:"Save as JSON", class: "btn"}, client.export.bind(client, "json")),
