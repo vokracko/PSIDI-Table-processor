@@ -166,20 +166,10 @@ class Client {
 		);
 	}
 
-	save(result) {
-		result = JSON.parse(result);
-		var mimeType;
-		var ext;
-		var filename = "dataset";
-
-		switch(result.format) {
-			case 'xml': mimeType = 'text/xml'; ext = 'xml'; break;
-			case 'json': mimeType = 'application/json'; ext = 'json'; break;
-			case 'csv': mimeType = 'text/csv'; ext = 'csv'; break;
-		}
-
-		var blob = new Blob([result.data], {type: mimeType + ";charset=utf-8"});
-		saveAs(blob, filename + '.' + ext);
+	save(result, obj) {
+		var mimeType = obj.getResponseHeader("Content-Type");
+		var blob = new Blob([result], {type: mimeType + ";charset=utf-8"});
+		saveAs(blob, "dataset." + mimeType.split('/')[1].split(';')[0]);
 	}
 
 	buildAddress(url) {
@@ -202,7 +192,7 @@ class Client {
 		request.onreadystatechange = function() {
 			if(this.readyState == 4) { //done 
 				console.log("client.sendRequest.done", this.responseText);
-				onReply(this.responseText);
+				onReply(this.responseText, this);
 			}
 		}
 		request.setRequestHeader("Content-Type", "application/json");

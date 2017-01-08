@@ -127,11 +127,25 @@ class Service {
 		} else if(req.query.format) { // export
 			this.db.datasetGet(req.dataset_id, function(err, rows) {
 				var converter;
+				var mimeType;
+				var ext;
 
 				switch(req.query.format) {
-					case 'xml': converter = new this.ioconverters.XML(); break;
-					case 'csv': converter = new this.ioconverters.CSV(); break;
-					case 'json': converter = new this.ioconverters.JSON(); break;
+					case 'xml': 
+						converter = new this.ioconverters.XML(); 
+						mimeType = 'text/xml'; 
+						ext = 'xml';
+						break;
+					case 'csv': 
+						converter = new this.ioconverters.CSV();
+						mimeType = 'text/csv'; 
+						ext = 'csv';						
+						break;
+					case 'json': 
+						converter = new this.ioconverters.JSON(); 
+						mimeType = 'application/json';
+						ext = 'json';
+						break;
 				}
 
 				if (!converter) {
@@ -146,7 +160,13 @@ class Service {
 					return;
 				}
 
-				res.json({data: data, format: req.query.format});
+				res.set({
+					'Content-Type': mimeType, 
+					'Content-Disposition': 'attachment;filename="dataset.' + ext + '"'
+				});
+
+				res.send(data);
+				// res.json({data: data, format: req.query.format});
 			}.bind(this));
 		}
 		else { // just send dataset
