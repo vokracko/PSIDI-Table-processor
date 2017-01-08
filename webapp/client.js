@@ -129,6 +129,8 @@ class Client {
 		var cb = this.log.bind(this);
 		var reader = new FileReader();
 		var client = this;
+		var arr = file.name.split('.');
+		var format = arr[arr.length - 1];
 		reader.onload = function(){
 			console.log("reading");
 			if(reader.readyState == 2) {// DONE
@@ -136,7 +138,7 @@ class Client {
 				client.sendRequest(
 					"put",
 					"/user/dataset/",
-					{data:reader.result, filename: file.name, name: name},
+					{data:reader.result, format: format, name: name},
 					function(result) {
 						var json = JSON.parse(result);
 						// TODO result.status code has error info too

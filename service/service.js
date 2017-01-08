@@ -174,12 +174,10 @@ class Service {
 	}
 
 	datasetPut(req, res) {
-		var arr = req.body.filename.split('.');
-		var ext = arr[arr.length - 1];
 		var converter;
 		var data;
 
-		switch(ext) {
+		switch(req.body.format) {
 			case 'xml': converter = new this.ioconverters.XML(); break;
 			case 'csv': converter = new this.ioconverters.CSV(); break;
 			case 'json': converter = new this.ioconverters.JSON(); break;
