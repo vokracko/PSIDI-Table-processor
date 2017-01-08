@@ -210,7 +210,7 @@ class Client {
 	log(response) {
 		response = JSON.parse(response);
 		console.log("log", response);
-		this.renderer.flashMessage("Result is " + response, "success");
+		this.renderer.flashMessage("Result is " + response.result, "success");
 	}
 
 	operation(operation) { 
@@ -267,7 +267,7 @@ class Client {
 			"/user/dataset/" + this.dataset_id + "?action=transpose",
 			null,
 			function(response) {
-				this.datasource.setData(JSON.parse(response));
+				this.datasource.setData(JSON.parse(response).result);
 				this.renderer.renderItems();
 			}.bind(this)
 		);
@@ -283,11 +283,11 @@ class Client {
 
 	datasetUpdate() {
 		var data = this.datasource.toArray();
-		this.sendRequest("post", "/user/dataset/" + this.dataset_id, data, this.flashMessage.bind(this, "Dataset saved", "success"));
+		this.sendRequest("post", "/user/dataset/" + this.dataset_id, {data:data}, this.flashMessage.bind(this, "Dataset saved", "success"));
 	}
 
 	renderTable(response) {
-		var data = JSON.parse(response);
+		var data = JSON.parse(response).data;
 		this.datasource.setData(data);
 		this.renderer.renderItems();
 	}
@@ -357,14 +357,14 @@ class Client {
 	}
 
 	datasetList(data) {
-		if(!data || JSON.parse(data).length == 0) {
+		if(!data || JSON.parse(data).data.length == 0) {
 			this.renderer.flashMessage("No dataset yet, import one", "notice");
 			return;
 		}
 
 		this.renderer.overlay.setData({text: "", type: "success"});
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
-		var select = new Select("form", {type:"text", options:JSON.parse(data)}, function(id) {
+		var select = new Select("form", {type:"text", options:JSON.parse(data).data}, function(id) {
 			this.renderer.overlay.hide();
 			this.datasetGet(id);
 		}.bind(this));

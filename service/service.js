@@ -55,7 +55,7 @@ class Service {
 
 	datasetGetList(req, res) {
 		this.db.datasetList(req.query.token, function(err, rows) {
-			res.json(rows);
+			res.json({data: rows});
 		});
 	}
 
@@ -152,7 +152,7 @@ class Service {
 		else { // just send dataset
 			this.db.datasetGet(req.dataset_id, function(err, rows) {
 
-				res.json(rows); // json -> rows = array
+				res.json({data: rows});
 			});
 		}
 
@@ -168,7 +168,7 @@ class Service {
 
 
 	datasetPost(req, res) {
-		this.db.datasetUpdate(req.dataset_id, req.body, function(err, result) {
+		this.db.datasetUpdate(req.dataset_id, req.body.data, function(err, result) {
 			res.status(200).send();
 		});
 	}
@@ -235,7 +235,7 @@ class Service {
 	macroList(req,res){
 		// TODO user id
 		this.db.macroList(1, function(err,result){
-			res.json(result);
+			res.json({data: rows});
         });
     }
 
@@ -244,7 +244,7 @@ class Service {
         var dataset= req.body.dataset;
         var macroId= req.body.macroId;
         this.db.macroOperations(macroId, function (err, result) {
-			res.json(result);
+			res.json({data: rows});
         }.bind(this));
 	}
 

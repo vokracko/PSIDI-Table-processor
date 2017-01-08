@@ -27,10 +27,10 @@ class Worker {
 			return;
 		}
 
-		var data = Object.assign(req.query, {values: req.body});
+		var data = Object.assign(req.query, {values: req.body.data});
 		var func = operation.bind(this); // bind "this == Worker" context to func
 		var f_res = func(data);
-		res.json(f_res);
+		res.json({result: f_res});
 	}
 
 	listen() {
