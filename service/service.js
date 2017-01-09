@@ -6,6 +6,7 @@ class Service {
 		var express = require('express');
 		var DbAdapter = require("./dbadapter.js");
 		var bodyParser = require('body-parser');
+		var BasicStrategy = require('passport-http').BasicStrategy;
 
 		this.ioconverters = require('./ioconverter.js');
 		this.workerManager = new WorkerManager(config);
@@ -14,9 +15,12 @@ class Service {
 		this.app = express();
 		this.port = config.port;
 
+		this.passport = require("passport");
+
+
 		this.app.use(function (req, res, next) {
 			res.header("Access-Control-Allow-Origin", "*");
-			res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+			res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Headers, Authorization");
 			res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 			next();
 		});
@@ -34,46 +38,56 @@ class Service {
 			return next();
 		});
 
-	}
+		var service = this;
 
-	start() {
-		this.app.put("/user/", this.userPut.bind(this)); // login
-        this.app.post("/user/", this.userPost.bind(this));
+		this.passport.use(new BasicStrategy(
+		  function(email, password, done) {
+		    service.db.autheticate(email, password, function (err, user) {
+		    	console.log(email, password, err, user);
+		    	if (err || !user) { 
+		    		return done(err);
+		    	}
+		      
+		    	return done(null, {email: email});
+		    });
+		  }
+		));
 
-        this.app.get("/user/dataset", this.datasetGetList.bind(this));
-		this.app.get("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetGet)); // operation
-		this.app.get("/user/dataset/:dataset_id/col/:index", this.authorize.bind(this, this.datasetGetCol)); // operation
-		this.app.get("/user/dataset/:dataset_id/row/:index", this.authorize.bind(this, this.datasetGetRow)); // operation
-		this.app.post("/user/dataset/:dataset_id", this.authorize.bind(this, this.datasetPost)); // update
-		this.app.put("/user/dataset/", this.datasetPut.bind(this)); // create TODO validate token
-
-		this.app.get("/user/macro", this.macroList.bind(this));
-		this.app.post("/user/macro", this.macroCreate.bind(this));
-		this.app.put("/user/macro", this.macroExecute.bind(this));
-		this.app.listen(this.port);
-	}
-
-	datasetGetList(req, res) {
-		this.db.datasetList(req.query.token, function(err, rows) {
-			res.json({data: rows});
-		});
 	}
 
 	authorize(cb, req, res) {
-		if(!req.query.token) {
-			res.status(401);
-			return;
-		}
-
+		console.log("authorize");
 		var cb = cb.bind(this, req, res);
 
-		this.db.authorize(req.query.token, req.dataset_id, function(err, result) {
+		this.db.authorize(req.user.email, req.dataset_id, function(err, result) {
 			if(err || result.length == 0) {
-				res.status(401); 
+				res.status(401).send(); 
 				return;
 			}
 
 			cb();
+		});
+	}
+
+	start() {
+        this.app.post("/user/", this.userPost.bind(this));
+
+        this.app.get("/user/dataset", this.passport.authenticate('basic', { session: false }), this.datasetGetList.bind(this));
+		this.app.get("/user/dataset/:dataset_id", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetGet)); // operation
+		this.app.get("/user/dataset/:dataset_id/col/:index", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetGetCol)); // operation
+		this.app.get("/user/dataset/:dataset_id/row/:index", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetGetRow)); // operation
+		this.app.post("/user/dataset/:dataset_id", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetPost)); // update
+		this.app.put("/user/dataset/", this.passport.authenticate('basic', { session: false }),this.datasetPut.bind(this)); 
+
+		this.app.get("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroList.bind(this));
+		this.app.post("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroCreate.bind(this));
+		this.app.put("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroExecute.bind(this));
+		this.app.listen(this.port);
+	}
+
+	datasetGetList(req, res) {
+		this.db.datasetList(req.user.email, function(err, rows) {
+			res.json({data: rows});
 		});
 	}
 
@@ -221,25 +235,6 @@ class Service {
 		})
 	}
 
-	userPut(req, res) {
-
-		if (!req.body.email || !req.body.password) {
-
-			res.status(400).send();
-			return;
-		}
-
-		this.db.userValidate(req.body.email, req.body.password, function(err, result) {
-			if(err || !result) {
-				res.status(400).send(); // TODO code
-				return;
-			} else {
-				res.json({token: result});
-				//console.log('here1');
-			}
-		});
-	}
-
 	macroCreate(req,res){
 		var name=req.body.name;
 		var ops= req.body.operations;
@@ -265,6 +260,7 @@ class Service {
 			res.json({data: rows});
         }.bind(this));
 	}
+
 
 }
 

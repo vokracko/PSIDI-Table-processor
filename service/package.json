@@ -6,7 +6,9 @@
 		"express": "latest",
 		"mysql": "latest",
 		"xmlhttprequest": "latest",
-		"body-parser": "latest"
+		"body-parser": "latest",
+		"passport-http": "latest",
+		"passport": "latest"
 	},
 	"scripts": {
 		"start": "node run.js"

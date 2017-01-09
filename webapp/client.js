@@ -5,7 +5,7 @@ class Client {
 		this.address = "http://" + ip + ":" + port;
 		this.renderer = renderer;
 		this.datasource = datasource;
-		this.token = null;
+		this.user = null;
 		this.dataset_id = 1;
 	}
 
@@ -38,13 +38,7 @@ class Client {
 			"/user",
 			{email:email, password: password},
 			function(token) {
-				if(token) {
-					client.token = token;
-					client.flashMessage("User successful created", "success");
-					client.datasetSelect();
-				} else {
-					client.flashMessage("Failed", "fail");
-				}
+				client.user = {email:email, password:password};
 			}
 		);
 	}
@@ -88,22 +82,20 @@ class Client {
 
 		var email = document.getElementById("email").value;
 		var password = document.getElementById("password").value;
+		this.user = {email:email, password:password};
 		var client = this;
-		//console.log(email);
-		//console.log(password);
-		this.sendRequest(
-			"put",//"post",
-			"/user/" ,//+email+"?password="+password,
-			{email:email, password: password},
-			function(response) {
-				if(!response) {
-					alert("Invalid credentials");
-					return;
-				}
 
-				client.token = JSON.parse(response).token;
-				client.flashMessage("Login successful", "success");
-				client.datasetSelect();
+		this.sendRequest(
+			"get",
+			"/user/dataset/",
+			null,
+			function(response, obj) {
+				if(obj.status == 200) {
+					client.flashMessage("Login successful", "success");			
+					client.datasetSelect();
+				} else {
+					client.flashMessage("Login failed", "fail");
+				}
 			}
 		);
 	}
@@ -175,12 +167,6 @@ class Client {
 	buildAddress(url) {
 		var res = this.address + url; 
 
-		if(url.indexOf('?') == -1) {
-			res += "?token=" + this.token;
-		} else {
-			res += "&token=" + this.token;
-		}
-
 		return res;
 	}
 
@@ -196,6 +182,7 @@ class Client {
 			}
 		}
 		request.setRequestHeader("Content-Type", "application/json");
+		request.setRequestHeader("Authorization", "Basic " + btoa(this.user.email + ':' + this.user.password));
 		request.send(JSON.stringify(data));
 	}
 

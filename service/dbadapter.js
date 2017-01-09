@@ -87,14 +87,21 @@ class DbAdapter {
 		});
 	}
 
-	datasetList(token, callback) {
-		this.connection.query('SELECT dataset.id, dataset.name FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE user.password = ?', [token], function(err, rows, fields) {
+	datasetList(email, callback) {
+		this.connection.query('SELECT dataset.id, dataset.name FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE user.email = ?', [email], function(err, rows, fields) {
 			callback(err, rows);
 		});
 	}
 
-	authorize(token, id, callback) {
-		this.connection.query('SELECT * FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE dataset.id = ? AND user.password = ?', [id, token], function(err, rows, fileds) {
+	autheticate(email, password, callback) {
+		//dataset LEFT JOIN user ON user.id = dataset.user_id dataset.id = ? AND
+		this.connection.query('SELECT * FROM user WHERE password = sha1(?) AND email = ?', [password, email], function(err, rows, fileds) {
+			callback(err, rows ? rows.length : null);
+		});
+	}
+
+	authorize(email, id, callback) {
+		this.connection.query('SELECT * FROM dataset LEFT JOIN user ON user.id = dataset.user_id WHERE dataset.id = ? AND user.email = ?', [id, email], function(err, rows, fileds) {
 			callback(err, rows);
 		});
 	}
@@ -103,12 +110,6 @@ class DbAdapter {
 	userCreate(email, password, callback) {
 		this.connection.query('INSERT INTO user VALUES (NULL, ?, sha1(?))', [email, password], function(err, result) {
 			callback(err, result.insertId);
-		});
-	}
-
-	userValidate(email, password, callback) {
-		this.connection.query('SELECT password AS token FROM user WHERE email = ? AND password = sha1(?)', [email, password], function(err, rows, fields) {
-			callback(err, rows.length ? rows[0].token : null);
 		});
 	}
 
