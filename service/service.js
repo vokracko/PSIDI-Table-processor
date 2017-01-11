@@ -76,8 +76,8 @@ class Service {
 		this.app.get("/user/dataset/:dataset_id", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetGet)); // operation
 		this.app.get("/user/dataset/:dataset_id/col/:index", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetGetCol)); // operation
 		this.app.get("/user/dataset/:dataset_id/row/:index", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetGetRow)); // operation
-		this.app.post("/user/dataset/:dataset_id", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetPost)); // update
-		this.app.put("/user/dataset/", this.passport.authenticate('basic', { session: false }),this.datasetPut.bind(this)); 
+		this.app.put("/user/dataset/:dataset_id", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetPut)); // update
+		this.app.post("/user/dataset/", this.passport.authenticate('basic', { session: false }),this.datasetPost.bind(this)); 
 
 		this.app.get("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroList.bind(this));
 		this.app.post("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroCreate.bind(this));
@@ -87,7 +87,7 @@ class Service {
 
 	datasetGetList(req, res) {
 		this.db.datasetList(req.user.email, function(err, rows) {
-			res.json({data: rows});
+			res.json({result: rows});
 		});
 	}
 
@@ -135,11 +135,19 @@ class Service {
 				dbCall = this.db.datasetGetFlat.bind(this.db);
 			}
 			dbCall(req.dataset_id, function(err, rows) {
+				if(err || !rows) {
+					res.status(404).send();
+					return;
+				}
 				this.workerManager.taskSubmit(req.query.action, scalar, rows, res);
 				console.log("service.operation done");
 			}.bind(this));	
 		} else if(req.query.format) { // export
 			this.db.datasetGet(req.dataset_id, function(err, rows) {
+				if(err || !rows) {
+					res.status(404).send();
+					return;
+				}
 				var converter;
 				var mimeType;
 				var ext;
@@ -180,13 +188,15 @@ class Service {
 				});
 
 				res.send(data);
-				// res.json({data: data, format: req.query.format});
 			}.bind(this));
 		}
 		else { // just send dataset
 			this.db.datasetGet(req.dataset_id, function(err, rows) {
-
-				res.json({data: rows});
+				if(err || !rows) {
+					res.status(404).send();
+					return;
+				}
+				res.json({result: rows});
 			});
 		}
 
@@ -196,18 +206,26 @@ class Service {
 	userPost(req, res) {
 		console.log("service.clientCreate", req.body);
 		this.db.userCreate(req.body.email, req.body.password, function (err, result) {
-			res.status(200).send();
+			if(err || !result) {
+				res.status(409).send();
+			} else {
+				res.status(201).send();
+			}
 		});
 	}
 
-
-	datasetPost(req, res) {
-		this.db.datasetUpdate(req.dataset_id, req.body.data, function(err, result) {
-			res.status(200).send();
-		});
-	}
 
 	datasetPut(req, res) {
+		this.db.datasetUpdate(req.dataset_id, req.body.data, function(err, result) {
+			if(err || !result) {
+				res.status(404).send()
+			} else {
+				res.status(200).send();
+			}
+		});
+	}
+
+	datasetPost(req, res) {
 		var converter;
 		var data;
 
@@ -225,7 +243,7 @@ class Service {
 		data = converter.toJSON(req.body.data);
 
 		if(!data) {
-			res.status(400).send(); // TODO correct code
+			res.status(400).send();
 			return;
 		}
 
@@ -248,7 +266,7 @@ class Service {
 	macroList(req,res){
 		// TODO user id
 		this.db.macroList(1, function(err,result){
-			res.json({data: rows});
+			res.json({result: rows});
         });
     }
 
@@ -257,7 +275,7 @@ class Service {
         var dataset= req.body.dataset;
         var macroId= req.body.macroId;
         this.db.macroOperations(macroId, function (err, result) {
-			res.json({data: rows});
+			res.json({result: rows});
         }.bind(this));
 	}
 

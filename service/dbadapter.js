@@ -94,7 +94,6 @@ class DbAdapter {
 	}
 
 	autheticate(email, password, callback) {
-		//dataset LEFT JOIN user ON user.id = dataset.user_id dataset.id = ? AND
 		this.connection.query('SELECT * FROM user WHERE password = sha1(?) AND email = ?', [password, email], function(err, rows, fileds) {
 			callback(err, rows ? rows.length : null);
 		});
@@ -109,7 +108,7 @@ class DbAdapter {
  
 	userCreate(email, password, callback) {
 		this.connection.query('INSERT INTO user VALUES (NULL, ?, sha1(?))', [email, password], function(err, result) {
-			callback(err, result.insertId);
+			callback(err, result ? result.insertId : null);
 		});
 	}
 

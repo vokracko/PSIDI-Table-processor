@@ -32,13 +32,20 @@ class Client {
 		var email = form.children[0].value;
 		var password = form.children[1].value;
 		var client = this;
+		this.user = {email:email, password: password};
 
 		this.sendRequest(
 			"post",
 			"/user",
 			{email:email, password: password},
-			function(token) {
-				client.user = {email:email, password:password};
+			function(msg, obj) {
+				if(obj.status != 201) {
+					client.flashMessage('Request failed', 'error');
+					client.createRegisterForm();
+				} else {
+					client.flashMessage('User created', 'success');
+					client.createLoginForm();
+				}
 			}
 		);
 	}
@@ -56,7 +63,10 @@ class Client {
 	}
 
 	createLoginForm(e) {
-		e.preventDefault();
+		if(e) {
+			e.preventDefault();
+		}
+
 		this.renderer.overlay.setData({text: "", type: "success"});
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
 		var email = new Input("form", {type:"text", id: "email"}, null);
@@ -128,7 +138,7 @@ class Client {
 			if(reader.readyState == 2) {// DONE
 				console.log(reader.result);
 				client.sendRequest(
-					"put",
+					"post",
 					"/user/dataset/",
 					{data:reader.result, format: format, name: name},
 					function(result) {
@@ -262,11 +272,11 @@ class Client {
 
 	datasetUpdate() {
 		var data = this.datasource.toArray();
-		this.sendRequest("post", "/user/dataset/" + this.dataset_id, {data:data}, this.flashMessage.bind(this, "Dataset saved", "success"));
+		this.sendRequest("put", "/user/dataset/" + this.dataset_id, {data:data}, this.flashMessage.bind(this, "Dataset saved", "success"));
 	}
 
 	renderTable(response) {
-		var data = JSON.parse(response).data;
+		var data = JSON.parse(response).result;
 		this.datasource.setData(data);
 		this.renderer.renderItems();
 	}
@@ -336,14 +346,14 @@ class Client {
 	}
 
 	datasetList(data) {
-		if(!data || JSON.parse(data).data.length == 0) {
+		if(!data || JSON.parse(data).result.length == 0) {
 			this.renderer.flashMessage("No dataset yet, import one", "notice");
 			return;
 		}
 
 		this.renderer.overlay.setData({text: "", type: "success"});
 		var form = new Form("overlay", {id: "form"}, function(e) {e.stopPropagation();});
-		var select = new Select("form", {type:"text", options:JSON.parse(data).data}, function(id) {
+		var select = new Select("form", {type:"text", options:JSON.parse(data).result}, function(id) {
 			this.renderer.overlay.hide();
 			this.datasetGet(id);
 		}.bind(this));
