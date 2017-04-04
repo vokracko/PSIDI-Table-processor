@@ -25,5 +25,3 @@ with your username
 
 # Configuration
 `{projectLocation}/{service,worker}/config.json`
-
-[Database administration](http://adminer.vokracko.cz/?server=31.31.77.215&username=psidi&db=psidi&select=cell) (password: psidi)

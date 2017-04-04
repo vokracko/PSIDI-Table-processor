@@ -36,29 +36,6 @@ CREATE TABLE `dataset` (
 INSERT INTO `dataset` (`id`, `user_id`, `name`) VALUES
 (1,	1,	'First');
 
-DROP TABLE IF EXISTS `macro`;
-CREATE TABLE `macro` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `macro_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-DROP TABLE IF EXISTS `operation`;
-CREATE TABLE `operation` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `macro_id` int(11) NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `data` text NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `macro_id` (`macro_id`),
-  CONSTRAINT `operation_ibfk_2` FOREIGN KEY (`macro_id`) REFERENCES `macro` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

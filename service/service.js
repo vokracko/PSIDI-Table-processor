@@ -79,9 +79,6 @@ class Service {
 		this.app.put("/user/dataset/:dataset_id", this.passport.authenticate('basic', { session: false }),this.authorize.bind(this, this.datasetPut)); // update
 		this.app.post("/user/dataset/", this.passport.authenticate('basic', { session: false }),this.datasetPost.bind(this)); 
 
-		this.app.get("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroList.bind(this));
-		this.app.post("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroCreate.bind(this));
-		this.app.put("/user/macro", this.passport.authenticate('basic', { session: false }),this.macroExecute.bind(this));
 		this.app.listen(this.port);
 	}
 
@@ -252,34 +249,6 @@ class Service {
 			res.json({errors: err, id: result});
 		})
 	}
-
-	macroCreate(req,res){
-		var name=req.body.name;
-		var ops= req.body.operations;
-		console.log(req.body);
-		// TODO user id
-		this.db.macroCreate(1,name,ops,function (err,result) {
-			res.status(200).send();
-		});
-	}
-
-	macroList(req,res){
-		// TODO user id
-		this.db.macroList(1, function(err,result){
-			res.json({result: rows});
-        });
-    }
-
-
-    macroExecute(req,res){
-        var dataset= req.body.dataset;
-        var macroId= req.body.macroId;
-        this.db.macroOperations(macroId, function (err, result) {
-			res.json({result: rows});
-        }.bind(this));
-	}
-
-
 }
 
 module.exports = Service;
